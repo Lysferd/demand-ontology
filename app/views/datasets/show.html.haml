@@ -1,0 +1,22 @@
+%p#notice= notice
+
+%table
+  %thead
+    %th
+      Name
+    %th
+      RDF Source
+    %th
+      Triple Count (TDB)
+    %th
+      Triple Count (RDF)
+
+  %tbody
+    %tr
+      %td= @dataset.name
+      %td= @dataset.rdf_source
+      %td= @dataset.count
+      %td= @dataset.count_rdf
+
+= link_to 'Edit', edit_dataset_path( @dataset )
+= link_to 'Back', datasets_path

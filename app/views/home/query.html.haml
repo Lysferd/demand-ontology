@@ -1,0 +1,12 @@
+%h2
+  Executar Query SPARQL
+  
+%p
+  = form_tag( 'query_results' ) do
+    = select_tag :dataset_id,
+      options_from_collection_for_select( Dataset::all, :id, :name ),
+      { prompt: 'Selecione uma Ontologia' }
+    %br/
+    %br/
+    = text_field_tag :query
+    = submit_tag 'Executar'

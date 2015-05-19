@@ -1,0 +1,785 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#"
+     xml:base="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas">
+        <rdfs:comment xml:lang="pt">Projeto de Ontologia destinada modelagem de sistemas prediais visando otimizar resposta à demanda (DR).</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Alimentador -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Alimentador">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Alimentadores"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Eficiencia -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Eficiencia">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Nivel_de_eficiência_energética"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Prioridade -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Prioridade">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Prioridade_de_uso"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Tipo -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_Tipo">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Eficiência_energética -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Eficiência_energética">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment xml:lang="pt">Define a relação entre potência consumida e iluminamento produzido
+Unidade = lumens/watt.</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_reativa -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_reativa">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment>Potencia reativa do equipamento</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_total -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_total">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment>Potencia total aparente do equipamento</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Prioridade_de_geração -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Prioridade_de_geração">
+        <owl:propertyDisjointWith rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Propridade_de_uso"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Propridade_de_uso -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Propridade_de_uso">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment>Informa a prioridade de uso da carga</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos"/>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_de_luminária -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_de_luminária">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment xml:lang="pt">Define tecnologia da luminária</rdfs:comment>
+        <rdfs:range rdf:resource="&rdfs;Literal"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Alimentadores -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Alimentadores">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Externos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Aquecedores_elétricos_de_ar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Aquecedores_elétricos_de_ar">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Aquecedores_elétricos_de_água -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Aquecedores_elétricos_de_água">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_drenagem -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_drenagem">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_incêndio -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_incêndio">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_pressurização_de_água_potável -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_pressurização_de_água_potável">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_pressurização_águas_cinzas -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_pressurização_águas_cinzas">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_recalque_de_esgotos -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_recalque_de_esgotos">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_recalque_água_potável -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_recalque_água_potável">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Central_de_água_gelada -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Central_de_água_gelada">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Chuveiros_automáticos -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Chuveiros_automáticos">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Circulação_e_áreas_comuns -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Circulação_e_áreas_comuns">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Classificacao -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Classificacao"/>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Co-geração -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Co-geração">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Compressores_de_ar_comprimidor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Compressores_de_ar_comprimidor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Concessionária -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Concessionária">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Equipamentos_e_cargas"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Elevadores_de_carga -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Elevadores_de_carga">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Elevadores_de_serviço -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Elevadores_de_serviço">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Elevadores_sociais -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Elevadores_sociais">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Emergência -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Emergência">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Equipamentos_e_cargas -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Equipamentos_e_cargas">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Escadas_rolantes_descida -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Escadas_rolantes_descida">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Escadas_rolantes_subida -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Escadas_rolantes_subida">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Esteiras -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Esteiras">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Exaustores -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Exaustores">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Fan-coil -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Fan-coil">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geradores -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geradores">
+        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Equipamentos_e_cargas"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_diesel -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_diesel">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_elólica -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_elólica">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_solar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_solar">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Nivel_de_eficiência_energética -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Nivel_de_eficiência_energética">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Classificacao"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Pressurização_escada_de_incêndio -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Pressurização_escada_de_incêndio">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Prioridade_de_uso -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Prioridade_de_uso">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Classificacao"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Self_contained -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Self_contained">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Externos -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Externos">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Prediais"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Hidráulicos">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Prediais"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Prediais -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Prediais"/>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Prediais"/>
+        <rdfs:comment xml:lang="pt">Estabelece a escala de prioridade no acionamento de sistemas de geração local ou externos</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_transporte">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Classificacao"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tomadas_de_uso_geral_1 -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tomadas_de_uso_geral_1">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tomadas_de_uso_geral_2 -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tomadas_de_uso_geral_2">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Elétricos"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Unidade_de_termoacumulação -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Unidade_de_termoacumulação">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Unidades_VRF -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Unidades_VRF">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Ventiladores_de_renovação_ar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Ventiladores_de_renovação_ar">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_de_Ar_Condicionado_e_Ventilação"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#nobreak -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#nobreak">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_de_Geração"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Áreas_de_trabalho -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Áreas_de_trabalho">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CEEE -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CEEE">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Concessionária"/>
+        <rdfs:comment>Concessionária de energia do RS</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#COPEL -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#COPEL">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Concessionária"/>
+        <rdfs:comment>Concessionária energia do PR</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CPFL -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CPFL">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Concessionária"/>
+        <rdfs:comment>Concessionária de energia de SP</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Conforto -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Conforto"/>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Decorativo -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Decorativo">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Emergenciais -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Emergenciais">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Essenciais -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Essenciais">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_diesel"/>
+        <Potencia_total rdf:datatype="&xsd;int">15000</Potencia_total>
+        <rdfs:comment>Grupo motogerador a diesel
+Máquina térmica</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao"/>
+        <Potencia_reativa rdf:datatype="&xsd;int">400</Potencia_reativa>
+        <Potencia_total rdf:datatype="&xsd;int">550</Potencia_total>
+        <Tipo_de_luminária rdf:datatype="&rdfs;Literal">LED</Tipo_de_luminária>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_drenagem"/>
+        <Potencia_reativa rdf:datatype="&xsd;int">3000</Potencia_reativa>
+        <rdfs:comment xml:lang="pt">Conjunto motor elétrico e bombas de palhetas para esgotamento de águas pluviais</rdfs:comment>
+        <has_Prioridade rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM"/>
+        <has_Tipo rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM"/>
+    </owl:NamedIndividual>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;NegativePropertyAssertion"/>
+        <owl:targetValue rdf:datatype="&xsd;int">3</owl:targetValue>
+        <owl:sourceIndividual rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM"/>
+        <owl:assertionProperty rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Prioridade_de_geração"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_HIDRANTE -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_HIDRANTE">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_de_incêndio"/>
+        <Potencia_reativa rdf:datatype="&xsd;int">2500</Potencia_reativa>
+        <rdfs:comment xml:lang="pt">Conjunto motor elétrico e bomba centrífuga para pressurização de redes de hidrantes de combate a incêndios.</rdfs:comment>
+        <has_Prioridade rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM"/>
+        <has_Tipo rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_DRENAGEM"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_RECALQUE_AGUA_POTAVEL -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_RECALQUE_AGUA_POTAVEL">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Bombas_recalque_água_potável"/>
+        <Potencia_reativa rdf:datatype="&xsd;int">3400</Potencia_reativa>
+        <rdfs:comment xml:lang="pt">Conjunto motor elétrico e bomba de palhetas para recalque de água potável ao reservatório superior.</rdfs:comment>
+        <has_Prioridade rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_SPRINKLERS"/>
+        <has_Tipo rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_SPRINKLERS"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_SPRINKLERS -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_SPRINKLERS">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Chuveiros_automáticos"/>
+        <Potencia_reativa rdf:datatype="&xsd;int">3100</Potencia_reativa>
+        <rdfs:comment xml:lang="pt">Conjunto motor e bomba centrígufa para pressurização da rede de chuveiros automáticos.</rdfs:comment>
+        <has_Prioridade rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_HIDRANTE"/>
+        <has_Tipo rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MOTOBOMBA_DE_HIDRANTE"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Utilidade -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Utilidade">
+        <rdf:type rdf:resource="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_sistema"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Decorativo"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Utilidade"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CEEE"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#COPEL"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CPFL"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CEEE"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#COPEL"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#CPFL"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Conforto"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Utilidade"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Decorativo"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Emergenciais"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Essenciais"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

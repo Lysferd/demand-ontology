@@ -1,0 +1,29 @@
+!!! 5
+
+%html
+  %head
+    %title
+      Ontologias de Demanda
+    = stylesheet_link_tag 'application', media: :all, 'data-turbolinks-track' => true
+    = javascript_include_tag 'application', 'data-turbolinks-track' => true
+    = csrf_meta_tags
+
+  %body
+    #header
+      %h1
+        Ontologias de Demanda
+    - if flash[:notice]
+      .notice
+        %p= flash[:notice]
+    #menu
+      %h3
+        Menu de Navegação
+      %ul
+        %li= link_to( 'Página Inicial', root_path )
+        %li= link_to( 'Datasets', datasets_path )
+        %li= link_to( 'Query', home_query_path )
+    #contents
+      = yield
+    %div{ style: 'clear: both;' }
+    #footer
+      Sistema de Ontologias de Demanda Versão 1.0 por &#x4A3A;&#x9F98;&#x9F92;&#x9738; &copy; 2015.

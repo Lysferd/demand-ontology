@@ -1,0 +1,14 @@
+%h2
+  Resultado da Query SPARQL
+%p
+  Query inserida:
+%table
+  %tr
+    %td=@query
+
+%p
+  Resultado:
+%table
+  - @results.each do | result |
+    %tr
+      %td= result
