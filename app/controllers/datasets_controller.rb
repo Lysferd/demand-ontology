@@ -1,8 +1,22 @@
+# Encoding: UTF-8
+
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
 
   def create_individual
-    #@dataset = Dataset
+    @dataset = Dataset::find_by_id( params[:id] )
+    @classes = [ ]
+    @dataset.query( 'SELECT ?class WHERE { ?class a owl:Class }' ) do | exec |
+      exec.exec_select.each do | result |
+        @classes << result.to_s.match( /#(?<class>[a-z\-çãé]+)/i )[:class] rescue next
+      end
+    end
+  end
+
+  def send_rdf_source
+    dataset = Dataset::find_by_id( params[:id] )
+    path = "datasets/#{dataset.name}/#{dataset.rdf_source}"
+    send_file( path, type: 'application/owl+xml', x_sendfile: true )
   end
 
   # GET /datasets

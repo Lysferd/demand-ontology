@@ -1,9 +1,6 @@
-%h1
-  Criar Invidivíduo no Dataset
+%h2= "Adicionando Indivíduo em #{@dataset.name}"
 
-%table
-  %tr
-    %td
-      NULL
+= form_tag( '/' ) do
+  = select_tag :ont_class, options_for_select(@classes.collect.with_index { |s, i| p [s, i+1] }), { prompt: 'Selecione uma classe' }
 
-= link_to 'Voltar', dataset_path( @dataset )
+= button_get 'Voltar', dataset_path

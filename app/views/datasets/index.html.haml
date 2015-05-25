@@ -1,25 +1,21 @@
-%p.notice
-  = notice
-
 %h2
   Listing Datasets
 %table
   %thead
     %tr
       %th
-        Name
+        Nome
+      /%thRDF de Origem
       %th
-        RDF Source
-      %th
-        Options
+        Opções
   %tbody
     - @datasets.each do | dataset |
       %tr
         %td= dataset.name
-        %td= dataset.rdf_source
+        /%td= link_to dataset.rdf_source, "/datasets/#{dataset.name}/#{dataset.rdf_source}"
         %td
-          = link_to 'Details', dataset
-          = link_to 'Edit', edit_dataset_path( dataset )
-          = link_to 'Destroy', dataset, method: :delete, data: { confirm: 'Confirm deletion' }
+          = button_get 'Detalhes', dataset
+          = button_get 'Editar', edit_dataset_path( dataset )
+          = button_get 'Destruir', dataset
 
-= link_to 'New Dataset', new_dataset_path
+= button_get 'Novo Dataset', new_dataset_path

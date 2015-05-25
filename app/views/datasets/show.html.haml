@@ -1,23 +1,21 @@
-%p#notice= notice
-
 %table
   %thead
     %th
-      Name
+      Nome
     %th
-      RDF Source
+      Arquivo RDF/OWL
     %th
-      Triple Count (TDB)
+      Contagem de Triplas no TDB
     %th
-      Triple Count (RDF)
+      Contagem de Triplas no RDF/OWL
 
   %tbody
     %tr
       %td= @dataset.name
-      %td= @dataset.rdf_source
+      %td= link_to @dataset.rdf_source, send_rdf_source_path( @dataset.id )
       %td= @dataset.count
       %td= @dataset.count_rdf
 
-= link_to 'Criar Indivíduo', create_individual_path( @dataset )
-= link_to 'Editar', edit_dataset_path( @dataset )
-= link_to 'Voltar', datasets_path
+= button_get 'Adicionar Indivíduo', create_individual_path( @dataset )
+= button_get 'Editar', edit_dataset_path( @dataset )
+= button_get 'Voltar', datasets_path

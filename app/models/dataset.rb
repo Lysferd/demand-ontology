@@ -14,7 +14,7 @@ class Dataset < ActiveRecord::Base
 
   private
   def generate_tdb
-    @name = self.name.downcase.split.join( '_' )
+    self.name = self.name.downcase.split.join( '_' )
 
     # -=-=-=-=-
     # Create folder for all datasets.
@@ -25,7 +25,7 @@ class Dataset < ActiveRecord::Base
     # Create folder for this dataset.
     # fixme: name cannot contain spaces
     #   or they have to be escaped
-    path += "/#{@name}"
+    path += "/#{self.name}"
     Dir::mkdir( path ) unless FileTest::exist?( path )
 
     # -=-=-=-=-
@@ -47,9 +47,9 @@ class Dataset < ActiveRecord::Base
 
   def create_dataset
     @tdb = TDB::TDBFactory::create_dataset( File::join( DATASET_FOLDER, self.name, 'tdb' ) )
-    @tdb.begin( Query::ReadWrite::READ )
-  ensure
-    @tdb.end
+    #@tdb.begin( Query::ReadWrite::READ )
+  #ensure
+    #@tdb.end
   end
   alias :load_dataset :create_dataset
 
@@ -94,7 +94,7 @@ class Dataset < ActiveRecord::Base
 
     yield( query_exec )
   ensure
-    @tdb.end
+    #@tdb.end
     #query_exec.close
   end
 
