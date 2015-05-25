@@ -21,9 +21,11 @@ test:
   adapter: jdbcsqlite3
   database: db/test.sqlite3
 
+# adapter: jdbcpostgresql
+# database: demand_ontology_production
+# username: oadr
+# password: oadr
 production:
   <<: *default
-  adapter: jdbcpostgresql
-  database: demand_ontology_production
-  username: none
-  password: none
+  adapter: jdbcsqlite3
+  database: db/production.sqlite3

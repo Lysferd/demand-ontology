@@ -7,13 +7,15 @@ class Dataset < ActiveRecord::Base
   DATASET_FOLDER = File::join( Dir::pwd, 'datasets' )
 
   before_create :generate_tdb
-  #before_destroy :destroy_tdb
+  before_destroy :destroy_tdb
 
   validates :name, presence: true, uniqueness: true
   validates :rdf_source, presence: true
 
   private
   def generate_tdb
+    @name = self.name.downcase.split.join( '_' )
+
     # -=-=-=-=-
     # Create folder for all datasets.
     path = DATASET_FOLDER
@@ -23,16 +25,16 @@ class Dataset < ActiveRecord::Base
     # Create folder for this dataset.
     # fixme: name cannot contain spaces
     #   or they have to be escaped
-    path += "/#{self.name}"
+    path += "/#{@name}"
     Dir::mkdir( path ) unless FileTest::exist?( path )
 
     # -=-=-=-=-
     # Save uploaded RDF source file.
-    path += "/#{self.rdf_source[0].original_filename}"
+    path += "/#{self.rdf_source[0].original_filename.downcase.split.join( '_' )}"
     File::open( path, 'wb' ) do | rdf |
       rdf.write( self.rdf_source[0].read )
     end
-    self.rdf_source = self.rdf_source[0].original_filename
+    self.rdf_source = self.rdf_source[0].original_filename.downcase.split.join( '_' )
 
     # -=-=-=-=-
     # use jena api to create dataset
@@ -41,8 +43,6 @@ class Dataset < ActiveRecord::Base
 
     create_dataset
     populate_dataset( model )
-
-    model = nil
   end
 
   def create_dataset

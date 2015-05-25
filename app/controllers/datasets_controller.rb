@@ -1,14 +1,8 @@
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
 
-  def sparql
-    @result = [ ]
-    Dataset::find_by_id( params[:id] ).query( params[:query] ) do | query |
-      query.exec_select.each do | result |
-        @result << result.to_string
-      end
-    end
-    render :sparql, format: :js
+  def create_individual
+    #@dataset = Dataset
   end
 
   # GET /datasets

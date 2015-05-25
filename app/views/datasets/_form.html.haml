@@ -5,14 +5,15 @@
       %ul
         - @dataset.errors.full_messages.each do | message |
           %li= message
-
-  #field
-    = f.label :name
-    %br/
-    = f.text_field :name
-  #field
-    = f.label :rdf_source
-    %br/
-    = f.file_field :rdf_source, multiple: true
-  #actions
-    = f.submit
+  %table
+    %thead
+      %th= f.label :name, 'Nome da Ontologia'
+      %th= f.label :rdf_source, 'Arquivo RDF/OWL'
+    %tbody
+      %tr
+        %td= f.text_field :name
+        %td= f.file_field :rdf_source, multiple: true
+    %tbody
+      %tr
+        %td( colspan=2 )
+          = f.submit 'Criar Dataset'

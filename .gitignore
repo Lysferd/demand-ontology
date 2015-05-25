@@ -13,6 +13,9 @@
 # Ignore SQLite3 files.
 *.sqlite3
 
+# Ignore precompiled assets.
+/public/assets
+
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep

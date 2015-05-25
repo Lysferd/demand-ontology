@@ -18,5 +18,6 @@
       %td= @dataset.count
       %td= @dataset.count_rdf
 
-= link_to 'Edit', edit_dataset_path( @dataset )
-= link_to 'Back', datasets_path
+= link_to 'Criar Indivíduo', create_individual_path( @dataset )
+= link_to 'Editar', edit_dataset_path( @dataset )
+= link_to 'Voltar', datasets_path

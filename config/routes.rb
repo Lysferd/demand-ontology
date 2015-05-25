@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  # -=-=-=-=-
+  # Define Resources
   resources :datasets
   resources :users
 
@@ -8,11 +10,7 @@ Rails.application.routes.draw do
   get 'home/index'
   get 'home/query'
   post 'home/query_results'
-
-  post 'datasets/sparql'
-
-  resources :users
-  resources :datasets
+  get 'datasets/create_individual/:id', to: 'datasets#create_individual', as: 'create_individual'
 
   # -=-=-=-=-
   # Define ROOT Route:
