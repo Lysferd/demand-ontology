@@ -5,27 +5,23 @@
 # gem 'activerecord-jdbcsqlite3-adapter'
 #
 default: &default
+  adapter: jdbcsqlite3
   encoding: unicode
   pool: 5
+  #username: demand
+  #password: demand
 
 development:
   <<: *default
-  adapter: jdbcsqlite3
-  database: db/development.sqlite3
+  database: db/demandontology_development.sqlite3
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  adapter: jdbcsqlite3
-  database: db/test.sqlite3
+  database: db/demandontology_test.sqlite3
 
-# adapter: jdbcpostgresql
-# database: demand_ontology_production
-# username: oadr
-# password: oadr
 production:
   <<: *default
-  adapter: jdbcsqlite3
-  database: db/production.sqlite3
+  database: db/demandontology_production.sqlite3

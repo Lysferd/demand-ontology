@@ -7,10 +7,19 @@ Rails.application.routes.draw do
 
   # -=-=-=-=-
   # Define HTTP GET/POST Routes:
-  get 'home/index'
-  get 'home/query'
-  post 'home/query_results'
-  get 'datasets/create_individual/:id', to: 'datasets#create_individual', as: 'create_individual'
+  controller :home do
+    get 'index' => :index
+    get 'query' => :query
+    post 'query' => :query_results
+
+    get 'login' => :login
+    post 'login' => :create_session
+    delete 'logout' => :destroy_session
+  end
+
+  get 'datasets/create_individual/:id',
+    to: 'datasets#create_individual',
+    as: 'create_individual'
 
   # -=-=-=-=-
   # Define AJAX Requests:

@@ -1,0 +1,13 @@
+= content_for( :subtitle ) do
+  = "Detalhes de #{@user.name.match(/^([\wáéíúóãõâôêàç]+)\s/i)[1]}"
+
+%p
+  Nome:
+  = @user.name
+
+%p
+  E-mail:
+  = @user.email
+
+= button_get 'Edit', edit_user_path(@user)
+= button_get 'Back', users_path

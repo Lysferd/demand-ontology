@@ -1,6 +1,13 @@
-%h2= "Adicionando Indivíduo em #{@dataset.name}"
+= content_for( :subtitle ) do
+  Adicionando Indivíduo
 
-= form_tag( '/' ) do
-  = select_tag :ont_class, options_for_select(@classes.collect.with_index { |s, i| p [s, i+1] }), { prompt: 'Selecione uma classe' }
+#form
+  = form_tag( '/' ) do
+    %p
+      = label_tag :individual_class, 'Classe do Indivíduo:'
+      = select_tag :individual_class, options_for_select(@classes.collect.with_index { |s, i| p [s, i+1] }), { prompt: 'Selecione uma classe' }
+    %p
+      = label_tag :individual_name, 'Nome do Indivíduo:'
+      = text_field_tag :individual_name
 
-= button_get 'Voltar', dataset_path
+  = button_get 'Voltar', dataset_path

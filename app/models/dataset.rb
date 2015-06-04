@@ -12,7 +12,12 @@ class Dataset < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
   validates :rdf_source, presence: true
 
+  belongs_to :user
+
   private
+  #============================================================================
+  # *
+  #============================================================================
   def generate_tdb
     self.name = self.name.downcase.split.join( '_' )
 
@@ -45,6 +50,9 @@ class Dataset < ActiveRecord::Base
     populate_dataset( model )
   end
 
+  #============================================================================
+  # *
+  #============================================================================
   def create_dataset
     @tdb = TDB::TDBFactory::create_dataset( File::join( DATASET_FOLDER, self.name, 'tdb' ) )
     #@tdb.begin( Query::ReadWrite::READ )
@@ -53,6 +61,9 @@ class Dataset < ActiveRecord::Base
   end
   alias :load_dataset :create_dataset
 
+  #============================================================================
+  # *
+  #============================================================================
   def populate_dataset( model )
     @tdb.begin( Query::ReadWrite::WRITE )
     @tdb.get_default_model.add( model )
@@ -61,11 +72,17 @@ class Dataset < ActiveRecord::Base
     @tdb.end
   end
 
+  #============================================================================
+  # *
+  #============================================================================
   def destroy_tdb
     FileUtils::rm_r( File::join( DATASET_FOLDER, self.name ) )
   end
 
   public
+  #============================================================================
+  # *
+  #============================================================================
   def count
     load_dataset
 
@@ -75,12 +92,18 @@ class Dataset < ActiveRecord::Base
     @tdb.end
   end
   
+  #============================================================================
+  # *
+  #============================================================================
   def count_rdf
     model = Core::ModelFactory::create_ontology_model( Ont::OntModelSpec::OWL_MEM )
     Util::FileManager::get.read_model( model, File::join( DATASET_FOLDER, self.name, self.rdf_source ) )
     return( model.size )
   end
 
+  #============================================================================
+  # *
+  #============================================================================
   def query( string )
     load_dataset
 
@@ -98,6 +121,9 @@ class Dataset < ActiveRecord::Base
     #query_exec.close
   end
 
+  #============================================================================
+  # *
+  #============================================================================
   def query_to_array( string )
     results = [ ]
     query( string ) do | query_exec |
