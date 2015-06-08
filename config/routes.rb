@@ -17,13 +17,16 @@ Rails.application.routes.draw do
     delete 'logout' => :destroy_session
   end
 
-  get 'datasets/create_individual/:id',
-    to: 'datasets#create_individual',
-    as: 'create_individual'
+  get 'datasets/new_individual/:id',
+    to: 'datasets#new_individual',
+    as: 'new_individual'
+
+  post 'create_individual' => 'datasets#create_individual'
 
   # -=-=-=-=-
   # Define AJAX Requests:
   get 'datasets/:id/send_rdf_source', to: 'datasets#send_rdf_source', as: 'send_rdf_source'
+  put 'add_property', to: 'datasets#add_property'
 
   # -=-=-=-=-
   # Define ROOT Route:

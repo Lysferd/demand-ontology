@@ -18,6 +18,7 @@
       %td= @dataset.count
       %td= @dataset.count_rdf
 
-= button_get 'Adicionar Indivíduo', create_individual_path( @dataset )
-= button_get 'Editar', edit_dataset_path( @dataset )
-= button_get 'Voltar', datasets_path
+%p
+  = button_get 'Adicionar Indivíduo', new_individual_path( @dataset )
+  = button_get 'Editar', edit_dataset_path( @dataset )
+  = button_get 'Voltar', datasets_path

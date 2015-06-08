@@ -4,17 +4,30 @@ class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
 
   #============================================================================
-  # *
+  # GET /new_individual
+  # * Creates a form page for the creation of individuals.
+  #============================================================================
+  def new_individual
+    dataset = Dataset::find_by_id( params[:id] )
+    @classes = dataset.classes
+    @properties = dataset.properties
+  end
+
+  #============================================================================
+  # POST /create_individual
+  # * Creates a new individual based on the parameters given.
   #============================================================================
   def create_individual
-    @dataset = Dataset::find_by_id( params[:id] )
-    @classes = [ ]
-    @dataset.query( 'SELECT ?class WHERE { ?class a owl:Class }' ) do | exec |
-      exec.exec_select.each do | result |
-        @classes << result.to_s.match( /#([a-z\-_áéíóúàâêôãõñç]+)/i )[1] rescue next
-      end
-    end
-    @classes.sort!
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id].to_i )
+    dataset.create_individual( params[:individual] )
+    redirect_to dataset
+  end
+  
+  #============================================================================
+  # PUT /add_property
+  #============================================================================
+  def add_property
+    @property = params[:property]
   end
 
   #============================================================================
@@ -32,7 +45,8 @@ class DatasetsController < ApplicationController
   # GET /datasets
   # GET /datasets.json
   def index
-    @datasets = Dataset::where( user_id: current_user.id )
+    @datasets = Dataset::all
+      #where( user_id: current_user.id )
   end
 
   # GET /datasets/1
