@@ -1,0 +1,178 @@
+#GET LIST OF INDIVIDUALS FROM MODEL
+# load model
+model = Jena::Core::ModelFactory::create_ontology_model( Jena::Ont::OntModelSpec::OWL_MEM )
+Jena::Util::FileManager::get.read_model( model, 'ontologias_de_demandas_rev01.owl' )
+
+# get namespace
+NS = model.get_ns_prefix_map['']
+
+#==CLASSES==#
+	ontclass = model.create_class( NS + 'classname' ) #=> returns new or existing class
+
+#==INDIVIDUALS==#
+# get/create individual
+	individual = model.create_individual( NS + 'individual_name', ontclass ) #=> returns new or existing individual
+	individual2 = model.get_individual( NS + individual2_name ) # returns existing individual
+
+#==OBJECT PROPERTY==#
+	obj_prop = model.create_object_property( NS + 'object_property_name' )
+	obj_property = model.get_object_property( NS + 'has_Eficiencia' )
+
+#==DATA(TYPE) PROPERTY==#
+data_property = model.create_datatype_property( NS + data_property_name )
+data_property = model.get_datatype_property( NS + 'has_Eficiencia' )	
+
+# add property to individual
+	individual.add_property( obj_property, 10 )
+	# in this case, Jena will consider `10' as a long.
+
+#==GET ALL ENUMERATORS==#
+# get all individuals (enumerator)
+  model.list_individuals
+    eg) .each { | i | puts i.to_s }
+    
+# get all classes (enumerator)
+  model.list_classes
+    eg) .each { | c | puts c.to_s }
+
+# get all object properties (enumerator)
+	model.list_object_properties
+		eg) .each { | obj_p | puts obj_p.to_s }
+
+# get all data(type) properties (enumerator)
+	model.list_datatype_properties
+		eg) .each { | data_p | puts data_p.to_s }
+
+# get all object, data(type) properties & annotations from individual (enumerator)
+	individual.list_properties
+		eg) .each { | properties | puts properties.to_s }
+
+# run sparql query
+  query = Jena::Query::QueryFactory::create( prefixes + query_string )
+  query_execution = Jena::Query::QueryExecutionFactory::create( query, model )
+  query_execution.exec_select.each { | r | puts r.to_s }
+  
+# get all individuals of a class (sparql style)
+  "SELECT ?i WHERE { ?i rdf:type demand:[myclass] }"
+# get all classes (sparql style)
+	"SELECT ?o WHERE { ?o a owl:Class }"
+
+=begin
+i.list_properties.each { |o| puts o.to_s }
+	#=> [
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MyNoBreak1,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_total,
+				"10"^^http://www.w3.org/2001/XMLSchema#long
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#MyNoBreak1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#nobreak
+			]
+
+i2.list_properties.each { |o| puts o.to_s }
+	#=> [
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC,
+				http://www.w3.org/2000/01/rdf-schema#comment,
+				"Grupo motogerador a diesel Máquina térmica"
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_total,
+				"15000"^^http://www.w3.org/2001/XMLSchema#int
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Geração_diesel
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#GERADOR_STEMAC,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.w3.org/2002/07/owl#NamedIndividual
+			]
+
+i3.list_properties.each { |properties| p properties.to_s } # Luminaria_1
+	#=> [
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_tipo_de_luminaria,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Teto_sobreposta
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#has_tecnologia,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#LED
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Tipo_de_luminária,
+				\"LED\"^^http://www.w3.org/2000/01/rdf-schema#Literal
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_total,
+				\"550\"^^http://www.w3.org/2001/XMLSchema#int
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Potencia_reativa,
+				\"400\"^^http://www.w3.org/2001/XMLSchema#int
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Iluminacao
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.w3.org/2002/07/owl#NamedIndividual
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.w3.org/2002/07/owl#Thing
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Consumidores
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistemas_Internos
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.w3.org/2000/01/rdf-schema#Resource
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Equipamentos_e_cargas
+			]
+
+			[
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Luminaria_1,
+				http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+				http://www.semanticweb.org/carlosandré/ontologies/2015/0/Ontologia_de_Demandas#Sistema_Predial
+			]
+
+=end

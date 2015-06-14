@@ -16,14 +16,16 @@ ActiveRecord::Schema.define(version: 20150511163601) do
   create_table "datasets", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.binary   "rdf_source"
+    t.integer  "user_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
 
   create_table "users", force: :cascade do |t|
     t.string   "name",            limit: 255
-    t.string   "password_digest", limit: 255
     t.string   "email",           limit: 255
+    t.string   "hashed_password", limit: 255
+    t.string   "auth_token",      limit: 255
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
   end

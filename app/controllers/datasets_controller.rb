@@ -3,26 +3,50 @@
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
 
-  def create_individual
-    @dataset = Dataset::find_by_id( params[:id] )
-    @classes = [ ]
-    @dataset.query( 'SELECT ?class WHERE { ?class a owl:Class }' ) do | exec |
-      exec.exec_select.each do | result |
-        @classes << result.to_s.match( /#(?<class>[a-z\-çãé]+)/i )[:class] rescue next
-      end
-    end
+  #============================================================================
+  # GET /new_individual
+  # * Creates a form page for the creation of individuals.
+  #============================================================================
+  def new_individual
+    dataset = Dataset::find_by_id( params[:id] )
+    @classes = dataset.classes
+    @properties = dataset.properties
   end
 
+  #============================================================================
+  # POST /create_individual
+  # * Creates a new individual based on the parameters given.
+  #============================================================================
+  def create_individual
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id].to_i )
+    dataset.create_individual( params[:individual] )
+    redirect_to dataset
+  end
+  
+  #============================================================================
+  # PUT /add_property
+  #============================================================================
+  def add_property
+    @property = params[:property]
+  end
+
+  #============================================================================
+  # *
+  #============================================================================
   def send_rdf_source
     dataset = Dataset::find_by_id( params[:id] )
     path = "datasets/#{dataset.name}/#{dataset.rdf_source}"
     send_file( path, type: 'application/owl+xml', x_sendfile: true )
   end
 
+  #============================================================================
+  # *
+  #============================================================================
   # GET /datasets
   # GET /datasets.json
   def index
-    @datasets = Dataset.all
+    @datasets = Dataset::all
+      #where( user_id: current_user.id )
   end
 
   # GET /datasets/1
@@ -86,6 +110,6 @@ class DatasetsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def dataset_params
-      params.require(:dataset).permit(:name, rdf_source: [])
+      params.require(:dataset).permit(:name, :user_id, rdf_source: [])
     end
 end

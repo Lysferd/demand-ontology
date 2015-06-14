@@ -1,4 +1,4 @@
-%h1
+= content_for( :subtitle ) do
   Novo Dataset
 = render 'form'
-= link_to 'Voltar', datasets_path
+= button_get 'Voltar', datasets_path

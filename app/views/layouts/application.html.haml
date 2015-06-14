@@ -9,21 +9,28 @@
     = csrf_meta_tags
 
   %body
-    #header
-      %h1
+    #head
+      #title
         Ontologias de Demanda
+        - if content_for?( :subtitle )
+          \:
+          = yield( :subtitle )
+      #logo= image_tag( 'logo.png' )
+
     - if flash[:notice]
       #notice
         %p= flash[:notice]
-    #menu
-      %h3
-        Menu de Navegação
-      %ul
-        %li= link_to( 'Página Inicial', root_path )
-        %li= link_to( 'Datasets', datasets_path )
-        %li= link_to( 'Query', home_query_path )
+
     #contents
+      - if current_user
+        %nav
+          %ul
+            %li= link_to( 'Meus Datasets', datasets_path )
+            %li= link_to( 'Usuários', users_path )
+            %li= link_to( 'Executar Query', query_path )
+            %li= link_to( 'Sair', logout_path, method: :delete )
       = yield
-    %div{ style: 'clear: both;' }
+
     #footer
-      Sistema de Ontologias de Demanda Versão 1.0 por &#x4A3A;&#x9F98;&#x9F92;&#x9738; &copy; 2015.
+      #copyright
+        Sistema de Ontologias de Demanda Versão 1.0 &copy; 2015.

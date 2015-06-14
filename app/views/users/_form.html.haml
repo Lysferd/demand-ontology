@@ -1,0 +1,34 @@
+= form_for @user do | f |
+  - if @user.errors.any?
+    #error_explanation
+      %h2
+        = pluralize( @user.errors.count, 'error' )
+        prohibited this user from being saved:
+      %ul
+        - @user.errors.full_messages.each do | message |
+          %li= message
+
+  %table
+    %tr
+      %td( class = 'label' )
+        = f.label :name, 'Nome Completo:'
+      %td= f.text_field :name
+
+    %tr
+      %td( class = 'label' )
+        = f.label :email, 'E-mail:'
+      %td= f.email_field :email
+
+    %tr
+      %td( class = 'label' )
+        = f.label :password, 'Senha:'
+      %td= f.password_field :password
+
+    %tr
+      %td( class = 'label' )
+        = f.label :password_confirmation, 'Confirmação de Senha:'
+      %td= f.password_field :password_confirmation
+
+    %tr
+      %td( colspan = 2 )
+        = f.submit

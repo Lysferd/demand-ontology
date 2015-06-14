@@ -1,6 +1,0 @@
-%h2= "Adicionando Indivíduo em #{@dataset.name}"
-
-= form_tag( '/' ) do
-  = select_tag :ont_class, options_for_select(@classes.collect.with_index { |s, i| p [s, i+1] }), { prompt: 'Selecione uma classe' }
-
-= button_get 'Voltar', dataset_path

@@ -1,5 +1,6 @@
-%h2
-  Listing Datasets
+= content_for( :subtitle ) do
+  Listando Datasets
+
 %table
   %thead
     %tr
@@ -12,10 +13,9 @@
     - @datasets.each do | dataset |
       %tr
         %td= dataset.name
-        /%td= link_to dataset.rdf_source, "/datasets/#{dataset.name}/#{dataset.rdf_source}"
         %td
           = button_get 'Detalhes', dataset
           = button_get 'Editar', edit_dataset_path( dataset )
-          = button_get 'Destruir', dataset
+          = button_delete 'Destruir', dataset
 
 = button_get 'Novo Dataset', new_dataset_path

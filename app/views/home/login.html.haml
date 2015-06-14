@@ -1,0 +1,17 @@
+#form
+  = form_tag :login do
+    %table
+      %tr
+        %td= label_tag :email, 'E-mail:'
+        %td= email_field_tag :email, params[:email], autofocus: true
+      %tr
+        %td= label_tag :password, 'Senha:'
+        %td= password_field_tag :password, params[:password], autocomplete: :off
+      %tr
+        %td( colspan = 2 )
+          = check_box_tag :remember, params[:remember]
+          = label_tag :remember, 'Manter-se logado'
+      %tr
+        %td( colspan = 2 )
+          = submit_tag 'Logar', { data: { disable_with: 'Logando...' } }
+          = button_get 'Esqueci minha senha', '#'

@@ -1,0 +1,24 @@
+= content_for( :subtitle ) do
+  Criando Indivíduo
+
+= form_tag( '/create_individual' ) do
+  = hidden_field_tag 'individual[dataset_id]', params[:id]
+  %table
+    %thead
+      %th
+        Propriedade
+      %th
+        Valor
+    %tbody
+      %tr
+        %td= label_tag 'individual[name]', 'Nome:'
+        %td= text_field_tag 'individual[name]'
+      %tr
+        %td= label_tag 'individual[class]', 'Classe:'
+        %td= select_tag 'individual[class]', options_for_select(@classes.collect { | s | [s, s] }), { prompt: 'Selecione uma classe' }
+      %tr
+        %td= select_tag 'property', options_for_select( @properties.collect { | prop | [ prop, prop ] } ), { prompt: 'Selecione propriedade' }
+        %td= link_to 'Adicionar Propriedade', '#', data: { property: nil }
+  %p
+    = submit_tag 'Aplicar'
+    = button_get 'Cancelar', dataset_path

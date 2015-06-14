@@ -1,0 +1,27 @@
+= content_for( :subtitle ) do
+  Lista de Usuários
+
+%table
+  %thead
+    %tr
+      %th
+        Nome
+      %th
+        E-mail
+      %th
+        Datasets
+      %th
+        Opções
+
+  %tbody
+    - @users.each do | user |
+      %tr
+        %td= user.name
+        %td= user.email
+        %td= user.datasets.count
+        %td
+          = button_get 'Detalhes', user
+          = button_get 'Editar', edit_user_path( user )
+          = button_delete 'Remover', user
+
+= button_get 'Novo Usuário', new_user_path

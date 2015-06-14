@@ -12,10 +12,13 @@
   %tbody
     %tr
       %td= @dataset.name
-      %td= link_to @dataset.rdf_source, send_rdf_source_path( @dataset.id )
+      %td
+        %span( title = 'Efetuar download do arquivo RDF/OWL' )
+          = link_to @dataset.rdf_source, send_rdf_source_path( @dataset.id )
       %td= @dataset.count
       %td= @dataset.count_rdf
 
-= button_get 'Adicionar Indivíduo', create_individual_path( @dataset )
-= button_get 'Editar', edit_dataset_path( @dataset )
-= button_get 'Voltar', datasets_path
+%p
+  = button_get 'Adicionar Indivíduo', new_individual_path( @dataset )
+  = button_get 'Editar', edit_dataset_path( @dataset )
+  = button_get 'Voltar', datasets_path
