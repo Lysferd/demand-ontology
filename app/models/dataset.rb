@@ -1,17 +1,30 @@
 class Dataset < ActiveRecord::Base
 
+  #-=-=-=-=-=-=-
+  # Jena-JRuby Library
   require( 'jena_jruby' )
 
-  include( Jena )
+  #-=-=-=-=-=-=-
+  # Module Mixins
+  include Jena
+  include Core, TDB, Query, Ont, Util
 
+  #-=-=-=-=-=-=-
+  # Constants
   DATASET_FOLDER = File::join( Dir::pwd, 'datasets' )
 
+  #-=-=-=-=-=-=-
+  # Callbacks
   before_create :generate_tdb
   before_destroy :destroy_tdb
 
+  #-=-=-=-=-=-=-
+  # Validations
   validates :name, presence: true, uniqueness: true
   validates :rdf_source, presence: true
 
+  #-=-=-=-=-=-=-
+  # Table References
   belongs_to :user
 
   private
@@ -42,46 +55,55 @@ class Dataset < ActiveRecord::Base
     self.rdf_source = self.rdf_source[0].original_filename.downcase.split.join( '_' )
 
     # -=-=-=-=-
-    # use jena api to create dataset
-    model = load_model
-    tdb   = create_dataset
-
-    # -=-=-=-=-
     # Populate Dataset with the Ontology Model.
-    begin
-      tdb.begin( Query::ReadWrite::WRITE )
-      tdb.get_default_model.add( model )
-      tdb.commit
-    ensure
-      tdb.end
-    end
+    tdb.begin( ReadWrite::WRITE )
+    tdb.get_default_model.add( model )
+    tdb.commit
+    tdb.end
   end
 
+  public
   #============================================================================
+  # *
   #============================================================================
-  def load_model
-    model = Core::ModelFactory::create_ontology_model( Ont::OntModelSpec::OWL_MEM )
-    Util::FileManager::get.read_model(
-      model,
-      File::join(
-        DATASET_FOLDER,
-        self.name,
-        self.rdf_source
-      )
-    )
-    return model
+  def namespace
+    unless @namespace
+      @namespace = model.get_ns_prefix_map['']
+    end
+    return @namespace
   end
-    
+
+  def owl_prefix
+    unless @owl_prefix
+      @owl_prefix = model.get_ns_prefix_map['owl']
+    end
+    return @owl_prefix
+  end
 
   #============================================================================
   # *
   #============================================================================
-  def create_dataset
-    TDB::TDBFactory::create_dataset(
-      File::join( DATASET_FOLDER, self.name, 'tdb' )
-    )
+  def model
+    unless @model
+      @model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
+      FileManager::get.read_model(
+        @model, File::join( DATASET_FOLDER, self.name, self.rdf_source )
+      )
+    end
+    return @model
   end
-  alias :load_dataset :create_dataset
+
+  #============================================================================
+  # *
+  #============================================================================
+  def tdb
+    unless @tdb
+      @tdb = TDBFactory::create_dataset(
+        File::join( DATASET_FOLDER, self.name, 'tdb' )
+      )
+    end
+    return @tdb
+  end
 
   #============================================================================
   # *
@@ -95,14 +117,20 @@ class Dataset < ActiveRecord::Base
   # * Dataset Individual Creation
   #============================================================================
   def create_individual( args )
-    tdb = load_dataset
-    model = load_model
-    ns = model.get_ns_prefix_map['']
+    ont_class = model.create_class( namespace + args[:class] )
+    named_individual = model.create_class( owl_prefix + 'NamedIndividual' )
 
-    ont_class = model.create_class( ns + args[:class] )
-    individual = model.create_individual( ns + args[:name], ont_class )
+    individual = model.create_individual( namespace + args[:name], ont_class )
+    model.create_individual( namespace + args[:name], named_individual )
 
-    tdb.begin( Query::ReadWrite::WRITE )
+    if args[:property]
+      for key, value in args[:property] do
+        property = model.get_property( namespace + key )
+        individual.add_property( property, value )
+      end
+    end
+
+    tdb.begin( ReadWrite::WRITE )
     tdb.get_default_model.add( model )
     tdb.commit
   ensure
@@ -113,8 +141,7 @@ class Dataset < ActiveRecord::Base
   # * Dataset Triple Count
   #============================================================================
   def count
-    tdb = load_dataset
-    tdb.begin( Query::ReadWrite::READ )
+    tdb.begin( ReadWrite::READ )
     return tdb.get_default_model.size
   ensure
     tdb.end
@@ -124,7 +151,7 @@ class Dataset < ActiveRecord::Base
   # * Model Triple Count
   #============================================================================
   def count_rdf
-    load_model.size
+    model.size
   end
 
   #============================================================================
@@ -133,7 +160,7 @@ class Dataset < ActiveRecord::Base
   # properly removing the trailing namespace.
   #============================================================================
   def classes
-    return load_model.list_classes.to_a.collect do | c |
+    return model.list_classes.to_a.collect do | c |
       c.to_s.match( /#(.+)/ )[1]
     end.sort
   end
@@ -151,7 +178,7 @@ class Dataset < ActiveRecord::Base
   # * Dataset Object Properties
   #============================================================================
   def object_properties
-    return load_model.list_object_properties.to_a.collect do | prop |
+    return model.list_object_properties.to_a.collect do | prop |
       prop.to_s.match( /#(.+)/ )[1]
     end.sort
   end
@@ -160,7 +187,7 @@ class Dataset < ActiveRecord::Base
   # * Dataset Data(type) Properties
   #============================================================================
   def datatype_properties
-    return load_model.list_datatype_properties.to_a.collect do | prop |
+    return model.list_datatype_properties.to_a.collect do | prop |
       prop.to_s.match( /#(.+)/ )[1]
     end.sort
   end
@@ -169,17 +196,15 @@ class Dataset < ActiveRecord::Base
   # * Dataset Query
   #============================================================================
   def query( string )
-    tdb = load_dataset
-    model = load_model
     prefixes = ''
 
     model.get_ns_prefix_map.each_pair do | k, v |
       prefixes += "prefix #{k.empty? ? 'demand' : k}: <#{v}>\n"
     end
 
-    q = Query::QueryFactory::create( prefixes + string )
-    tdb.begin( Query::ReadWrite::READ )
-    execution = Query::QueryExecutionFactory::create( q, tdb.get_default_model )
+    q = QueryFactory::create( prefixes + string )
+    tdb.begin( ReadWrite::READ )
+    execution = QueryExecutionFactory::create( q, tdb.get_default_model )
 
     yield( execution )
   ensure

@@ -43,9 +43,6 @@ gem 'bcrypt'#, '~> 3.1.7'
 # Use Jena-JRuby
 gem 'jena-jruby'
 
-# Use TorqueBox
-gem 'torquebox'
-
 group :development, :test do
   gem 'pry'
 end

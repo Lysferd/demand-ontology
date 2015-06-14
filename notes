@@ -56,6 +56,8 @@ data_property = model.get_datatype_property( NS + 'has_Eficiencia' )
   "SELECT ?i WHERE { ?i rdf:type demand:[myclass] }"
 # get all classes (sparql style)
 	"SELECT ?o WHERE { ?o a owl:Class }"
+# get all distintic properties from individuals of a type
+  "SELECT DISTINCT ?o ?p ?v WHERE { ?o a demand:[myclass] . ?o ?p ?v . }"
 
 =begin
 i.list_properties.each { |o| puts o.to_s }
