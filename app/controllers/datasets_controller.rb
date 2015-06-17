@@ -2,6 +2,7 @@
 
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
+  before_filter :check_cancel, only: [ :create, :update, :create_individual, :update_individual ]
 
   #============================================================================
   # GET /new_individual
@@ -18,20 +19,54 @@ class DatasetsController < ApplicationController
   # * Creates a new individual based on the parameters given.
   #============================================================================
   def create_individual
-    dataset = Dataset::find_by_id( params[:individual][:dataset_id].to_i )
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     dataset.create_individual( params[:individual] )
     redirect_to dataset
   end
   
   #============================================================================
-  # PUT /add_property
+  # AJAX PUT /add_property
+  # * Places a specific property field to create/update individual form.
   #============================================================================
   def add_property
+    @label = params[:label]
     @property = params[:property]
   end
 
   #============================================================================
-  # *
+  # GET /edit_individual
+  # * Creates a form page for updating an individual's properties.
+  #============================================================================
+  def edit_individual
+    dataset = Dataset::find_by_id( params[:id] )
+    @individual = dataset.find_individual( params[:name] )
+    @classes = dataset.classes
+    @properties = dataset.properties
+  end
+
+  #============================================================================
+  # POST /update_individual
+  # * Updates an existing individual's properties.
+  #============================================================================
+  def update_individual
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
+    dataset.update_individual( params[:individual] )
+    redirect_to dataset
+  end
+
+  #============================================================================
+  # DELETE /destroy_individual
+  # * Deletes an individual and all references to it.
+  #============================================================================
+  def destroy_individual
+    dataset = Dataset::find_by_id( params[:id] )
+    dataset.destroy_individual( params[:name] )
+    redirect_to dataset
+  end
+
+  #============================================================================
+  # AJAX GET /send_rdf_source
+  # * Sends the RDF/OWL source file to download.
   #============================================================================
   def send_rdf_source
     dataset = Dataset::find_by_id( params[:id] )
@@ -39,9 +74,6 @@ class DatasetsController < ApplicationController
     send_file( path, type: 'application/owl+xml', x_sendfile: true )
   end
 
-  #============================================================================
-  # *
-  #============================================================================
   # GET /datasets
   # GET /datasets.json
   def index
@@ -103,13 +135,23 @@ class DatasetsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_dataset
-      @dataset = Dataset.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_dataset
+    @dataset = Dataset.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def dataset_params
-      params.require(:dataset).permit(:name, :user_id, rdf_source: [])
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def dataset_params
+    params.require(:dataset).permit(:name, :user_id, rdf_source: [])
+  end
+
+  def check_cancel
+    return unless params[:commit] == 'Cancelar'
+
+    if params[:action] =~ /individual/
+      redirect_to( dataset_path( params[:individual][:dataset_id] ) )
+    else
+      redirect_to( datasets_path )
     end
+  end
 end

@@ -15,10 +15,12 @@
         %td= text_field_tag 'individual[name]'
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
-        %td= select_tag 'individual[class]', options_for_select(@classes.collect { | s | [s, s] }), { prompt: 'Selecione uma classe' }
+        %td= select_tag 'individual[class]',
+          select_helper( @classes, { prompt: 'Selecione uma classe' } )
       %tr
-        %td= select_tag 'property', options_for_select( @properties.collect { | prop | [ prop, prop ] } ), { prompt: 'Selecione propriedade' }
-        %td= link_to 'Adicionar Propriedade', '#', data: { property: nil }
+        %td= select_tag 'property',
+          select_helper( @properties, { prompt: 'Selecione propriedade' } )
+        %td= link_to 'Adicionar Propriedade', '#', data: { label: nil, property: nil }
   %p
     = submit_tag 'Aplicar'
-    = button_get 'Cancelar', dataset_path
+    = submit_tag 'Cancelar'

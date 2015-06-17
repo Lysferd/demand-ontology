@@ -7,7 +7,7 @@ class Dataset < ActiveRecord::Base
   #-=-=-=-=-=-=-
   # Module Mixins
   include Jena
-  include Core, TDB, Query, Ont, Util
+  include Core, TDB, Query, Ont
 
   #-=-=-=-=-=-=-
   # Constants
@@ -56,60 +56,135 @@ class Dataset < ActiveRecord::Base
 
     # -=-=-=-=-
     # Populate Dataset with the Ontology Model.
-    tdb.begin( ReadWrite::WRITE )
-    tdb.get_default_model.add( model )
-    tdb.commit
-    tdb.end
+    datawrite do
+      tdb.get_default_model.add( rdf_model )
+      tdb.commit
+    end
   end
 
   public
   #============================================================================
-  # *
+  # * Get Ontology Namespace
+  #  This method returns the ontology's namespace from the RDF/OWL source,
+  # since as of version 2.12.0 of Jena, there is a bug that impedes the
+  # dataset model from storing prefix values.
   #============================================================================
   def namespace
-    unless @namespace
-      @namespace = model.get_ns_prefix_map['']
-    end
-    return @namespace
-  end
-
-  def owl_prefix
-    unless @owl_prefix
-      @owl_prefix = model.get_ns_prefix_map['owl']
-    end
-    return @owl_prefix
+    return rdf_model.get_ns_prefix_map['']
   end
 
   #============================================================================
-  # *
+  # * Get OWL Prefix
+  #============================================================================
+  def owl_prefix
+    return rdf_model.get_ns_prefix_map['owl']
+  end
+
+  #============================================================================
+  # * Get/Create RDF/OWL Source Model
+  #============================================================================
+  def rdf_model
+    unless @rdf_model
+      @rdf_model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
+      Util::FileManager::get.read_model( @rdf_model, File::join( DATASET_FOLDER, self.name, self.rdf_source ) )
+    end
+    return @rdf_model
+  end
+
+  #============================================================================
+  # * Get/Create Dataset Model
+  #  This method loads and returns the model inside the TDB.
+  # Note that #get_default_model returns an instance of `ModelCom' class,
+  # which does not provide the ever-so-helpful methods like #list_individuals
+  # nor #list_classes. In order to be able to use these methods without SPARQL
+  # queries, it is necessary that a new `OntModel' object to be created, based
+  # on the default model within the dataset.
+  #
+  #  This method has been enhaced to check if the TDB is already in a
+  # transaction, and if true, does not tries to overlap it with yet another
+  # transaction. This fixes the following error:
+  # 'Java::ComHpHplJenaTdb::TDBException: Read-only block manager`
   #============================================================================
   def model
     unless @model
-      @model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
-      FileManager::get.read_model(
-        @model, File::join( DATASET_FOLDER, self.name, self.rdf_source )
-      )
+      spec = OntModelSpec::OWL_MEM
+      if tdb.in_transaction?
+        base_model = tdb.get_default_model
+      else
+        base_model = dataread { tdb.get_default_model }
+      end
+      @model = ModelFactory::create_ontology_model( spec, base_model )
     end
     return @model
   end
 
   #============================================================================
-  # *
+  # * Get/Create TDB
   #============================================================================
   def tdb
     unless @tdb
-      @tdb = TDBFactory::create_dataset(
-        File::join( DATASET_FOLDER, self.name, 'tdb' )
-      )
+      path = File::join( DATASET_FOLDER, self.name, 'tdb' )
+      @tdb = TDBFactory::create_dataset( path )
     end
     return @tdb
   end
 
   #============================================================================
-  # *
+  # * Destroy TDB
+  # FIXME just destroying the files on disk does not destroys it from memory.
+  # FIXME this method does not permanently remove the files, which accumulate
+  #       in the system's recycle bin and waste resources.
   #============================================================================
   def destroy_tdb
     FileUtils::rm_r( File::join( DATASET_FOLDER, self.name ) )
+  end
+
+  #============================================================================
+  # * Start TDB Transaction
+  #  A helper method to ease the use of TDB transactions.
+  #
+  # Arguments:
+  #  kind (Symbol) - :read, :r, :write, or :w
+  #
+  # Note that if the TDB is already undergoing a transaction, the Jena API will
+  # raise a Java::ComHpHplJenaSparql::JenaTransactionException exception, which
+  # is not rescue'd by design, since this is the most effective way to evade
+  # developing glitchy code with overlapping transactions.
+  #
+  # Also note that write transactions shall not automatically commit changes,
+  # so that the developer can decide to commit or rollback changes in runtime.
+  #============================================================================
+  def transaction( kind )
+    case kind
+    when :r, :read
+      tdb.begin( ReadWrite::READ )
+    when :w, :write
+      tdb.begin( ReadWrite::WRITE )
+    else
+      fail( ArgumentError, 'Expected valid transaction type: read or write.' )
+    end
+
+    yield
+  ensure
+    tdb.end if tdb.in_transaction?
+  end
+
+  #============================================================================
+  # * Start TDB Read Transaction
+  #  Helper method that simply passes the given block to the real transaction
+  # method.
+  #============================================================================
+  def dataread
+    self.transaction( :read, &Proc::new )
+  end
+
+  #============================================================================
+  # * Start TDB Write Transaction
+  #  Helper method that simply passes the given block to the real transaction
+  # method.
+  #============================================================================
+  def datawrite
+    self.transaction( :write, &Proc::new )
   end
 
   public
@@ -117,41 +192,104 @@ class Dataset < ActiveRecord::Base
   # * Dataset Individual Creation
   #============================================================================
   def create_individual( args )
-    ont_class = model.create_class( namespace + args[:class] )
-    named_individual = model.create_class( owl_prefix + 'NamedIndividual' )
+    datawrite do
+      ont_class = model.get_ont_class( namespace + args[:class] )
+      unless ont_class
+        fail ArgumentError, 'Given ontology class does not exist.'
+        tdb.abort
+      else
+        individual = model.create_individual( namespace + args[:name], ont_class )
+      end
 
-    individual = model.create_individual( namespace + args[:name], ont_class )
-    model.create_individual( namespace + args[:name], named_individual )
+      # -=-=-=-=-
+      # Manually include individual in owl:NamedIndividual type.
+      named_individual = model.create_class( owl_prefix + 'NamedIndividual' )
+      model.create_individual( namespace + args[:name], named_individual )
 
-    if args[:property]
-      for key, value in args[:property] do
-        property = model.get_property( namespace + key )
-        individual.add_property( property, value )
+      if args[:property]
+        for key, value in args[:property] do
+          property = model.get_property( namespace + key )
+          individual.add_property( property, value )
+        end
+      end
+
+      tdb.commit
+    end
+  end
+
+  #============================================================================
+  def update_individual( args )
+    datawrite do
+      individual = model.get_individual( namespace + args[:original_name] )
+
+      unless args[:original_name] == args[:name]
+        Util::ResourceUtils::rename_resource( individual, namespace + args[:name] )
+        individual = model.get_individual( namespace + args[:name] )
+      end
+
+      # FIXME: sometimes the owl:NamedIndividual class gets in the way.
+      ont_class = model.get_ont_class( namespace + args[:class] )
+      individual.ont_class = ont_class unless individual.get_ont_class == ont_class
+
+      if args[:property]
+        for key, value in args[:property] do
+          property = model.get_property( namespace + key )
+          resource = ResourceFactory::create_plain_literal( value )
+          if individual.has_property?( property ) and
+            not individual.get_property_value( property ) == resource
+            individual.set_property_value( property, resource )
+          else
+            individual.add_property( property, resource )
+          end
+        end
+      end
+
+      tdb.commit
+    end
+  end
+
+  #============================================================================
+  def destroy_individual( name )
+    datawrite do
+      individual = model.get_individual( namespace + name )
+      unless individual
+        tdb.abort
+        fail ArgumentError, 'Given individual does not exist.'
+      else
+        individual.remove
+        tdb.commit
       end
     end
+  end
 
-    tdb.begin( ReadWrite::WRITE )
-    tdb.get_default_model.add( model )
-    tdb.commit
-  ensure
-    tdb.end
+  #============================================================================
+  def find_individual( name )
+    model.list_individuals.each do | i |
+      return i if i.get_local_name == name
+    end
+  end
+
+  #============================================================================
+  # * Dataset Individual Array
+  #============================================================================
+  def individuals
+    return model.list_individuals.map do |i|
+      i.get_local_name
+    end.sort
   end
 
   #============================================================================
   # * Dataset Triple Count
   #============================================================================
   def count
-    tdb.begin( ReadWrite::READ )
-    return tdb.get_default_model.size
-  ensure
-    tdb.end
+    dataread { tdb.get_default_model.size }
   end
   
   #============================================================================
   # * Model Triple Count
   #============================================================================
   def count_rdf
-    model.size
+    rdf_model.size
   end
 
   #============================================================================
@@ -161,7 +299,7 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def classes
     return model.list_classes.to_a.collect do | c |
-      c.to_s.match( /#(.+)/ )[1]
+      c.get_local_name
     end.sort
   end
 
@@ -179,7 +317,7 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def object_properties
     return model.list_object_properties.to_a.collect do | prop |
-      prop.to_s.match( /#(.+)/ )[1]
+      prop.get_local_name
     end.sort
   end
 
@@ -188,7 +326,7 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def datatype_properties
     return model.list_datatype_properties.to_a.collect do | prop |
-      prop.to_s.match( /#(.+)/ )[1]
+      prop.get_local_name
     end.sort
   end
 
@@ -198,21 +336,20 @@ class Dataset < ActiveRecord::Base
   def query( string )
     prefixes = ''
 
-    model.get_ns_prefix_map.each_pair do | k, v |
-      prefixes += "prefix #{k.empty? ? 'demand' : k}: <#{v}>\n"
+    rdf_model.get_ns_prefix_map.each_pair do | k, v |
+      prefixes += "PREFIX #{k.empty? ? 'demand' : k}: <#{v}>\n"
     end
 
     q = QueryFactory::create( prefixes + string )
-    tdb.begin( ReadWrite::READ )
-    execution = QueryExecutionFactory::create( q, tdb.get_default_model )
-
-    yield( execution )
-  ensure
-    tdb.end
+    dataread do
+      yield( QueryExecutionFactory::create( q, tdb.get_default_model ) )
+    end
   end
 
   #============================================================================
-  # *
+  # * Array of Query Results
+  #  This helper method populates an `Array' object with the results of the
+  # query.
   #============================================================================
   def query_to_array( string )
     results = [ ]

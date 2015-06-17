@@ -4,11 +4,15 @@
 
 $ ->
   $( 'select#property' ).change ->
-    $( 'a[data-property]' ).data( 'property', $('select#property :selected').text() )
+    $( 'a[data-label]' ).data 'label', $('select#property :selected').text()
+    $( 'a[data-property]' ).data 'property', $( 'select#property :selected' ).val()
+
   $( 'a[data-property]' ).click ->
+    label = $( @ ).data( 'label' )
     property = $( @ ).data( 'property' )
+
     if !!$( 'input#individual_' + property ).length
-      alert 'A propriedade "' + property + '" já está presente no formulário.'
+      alert 'A propriedade "' + label + '" já está presente no formulário.'
 
     else if property == $( 'select#property :first').text() or property == null
       alert 'Nenhuma propriedade foi selecionada.'
@@ -18,5 +22,5 @@ $ ->
         type: 'PUT',
         url: '/add_property',
         dataType: 'script',
-        data: { property: property }
+        data: { label: label, property: property }
       }

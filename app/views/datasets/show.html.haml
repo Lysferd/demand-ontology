@@ -1,13 +1,20 @@
+= content_for( :subtitle ) do
+  = "detalhes de #{@dataset.name}"
+
 %table
+  %caption
+    Informações Básicas
   %thead
     %th
-      Nome
+      Nome do Dataset
     %th
-      Arquivo RDF/OWL
+      Arquivo RDF/OWL Original
     %th
-      Contagem de Triplas no TDB
+      Total de Triplas (TDB / RDF-OWL)
     %th
-      Contagem de Triplas no RDF/OWL
+      Total de Indivíduos (TDB)
+    %th
+      Opções
 
   %tbody
     %tr
@@ -15,10 +22,36 @@
       %td
         %span( title = 'Efetuar download do arquivo RDF/OWL' )
           = link_to @dataset.rdf_source, send_rdf_source_path( @dataset.id )
-      %td= @dataset.count
-      %td= @dataset.count_rdf
+      %td= "#{@dataset.count} / #{@dataset.count_rdf}"
+      %td= @dataset.individuals.to_a.size
+      %td
+        = button_get 'Editar', edit_dataset_path( @dataset )
+        = button_delete 'Excluir', @dataset
+%p
+
+%table
+  %caption
+    Lista de Indivíduos
+  %thead
+    %th
+      Nome do Indivíduo
+    /%th
+    /Classe do Indivíduo
+    %th
+      Opções
+
+  %tbody
+    - for individual in @dataset.individuals do
+      %tr
+        %td= individual
+        /%td
+        /= individual.get_ont_class.to_s rescue individual.list_properties.map { |o| o.to_s }
+        /- individual.list_ont_classes( true ).map do |c|
+        /- unless c.get_local_name =~ /namedindividual/i
+        /= c.to_s #get_local_name
+        %td
+          = button_get 'Editar', edit_individual_path( @dataset, individual )
+          = button_delete 'Excluir', destroy_individual_path( @dataset, individual )
 
 %p
   = button_get 'Adicionar Indivíduo', new_individual_path( @dataset )
-  = button_get 'Editar', edit_dataset_path( @dataset )
-  = button_get 'Voltar', datasets_path

@@ -26,11 +26,18 @@
         %nav
           %ul
             %li= link_to( 'Meus Datasets', datasets_path )
-            %li= link_to( 'Usuários', users_path )
             %li= link_to( 'Executar Query', query_path )
+            %li= link_to( 'Usuários', users_path )
             %li= link_to( 'Sair', logout_path, method: :delete )
       = yield
 
     #footer
       #copyright
-        Sistema de Ontologias de Demanda Versão 1.0 &copy; 2015.
+        Sistema de Ontologias de Demanda
+      #back-button
+        = button_get 'Voltar', :back
+      #links
+        %span( title = 'E-mail de Contato' )
+          = link_to image_tag('iconeemail.png'), 'mailto:carlosbarbosa1964@hotmail.com'
+        %span( title = 'Código-Fonte no Github' )
+          = link_to image_tag('GitHub-Mark-Light-32px.png'), 'https://github.com/CarlosBarbosa1964/demand-ontology'

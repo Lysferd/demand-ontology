@@ -1,0 +1,36 @@
+= content_for( :subtitle ) do
+  = "Editando #{@individual.get_local_name}"
+
+= form_tag( '/update_individual' ) do
+  = hidden_field_tag 'individual[dataset_id]', params[:id]
+  = hidden_field_tag 'individual[original_name]', params[:name]
+
+  %table
+    %thead
+      %th
+        Propriedade
+      %th
+        Valor
+    
+    %tbody
+      %tr
+        %td= label_tag 'individual[name]', 'Nome:'
+        %td= text_field_tag 'individual[name]', @individual.local_name
+      %tr
+        %td= label_tag 'individual[class]', 'Classe:'
+        %td= select_tag 'individual[class]',
+          select_helper( @classes, selected: @individual.ont_class.local_name )
+
+        - @individual.list_properties.each do | property |
+          - name = property.get_predicate.local_name
+          - next if name =~ /type/
+          %tr
+            %td= label_tag "individual[property][#{name}]", name.gsub( /_/, ' ' ).titleize + ':'
+            %td= text_field_tag "individual[property][#{name}]", property.get_resource
+      %tr
+        %td= select_tag 'property',
+          select_helper( @properties, prompt: 'Selecione propriedade' )
+        %td= link_to 'Adicionar Propriedade', '#', data: { label: nil, property: nil }
+  %p
+    = submit_tag 'Aplicar'
+    = submit_tag 'Cancelar'

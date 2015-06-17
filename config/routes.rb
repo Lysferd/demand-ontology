@@ -17,11 +17,16 @@ Rails.application.routes.draw do
     delete 'logout' => :destroy_session
   end
 
-  get 'datasets/new_individual/:id',
-    to: 'datasets#new_individual',
-    as: 'new_individual'
+  controller :datasets do
+    get 'new_individual/:id' => :new_individual, as: 'new_individual'
+    post 'create_individual' => :create_individual
 
-  post 'create_individual' => 'datasets#create_individual'
+    get 'edit_individual/:id/:name' => :edit_individual, as: 'edit_individual'
+    post 'update_individual' => :update_individual
+
+    delete 'destroy_individual/:id/:name' => :destroy_individual, as: 'destroy_individual'
+  end
+
 
   # -=-=-=-=-
   # Define AJAX Requests:
