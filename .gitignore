@@ -7,6 +7,9 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignoe RubyMine's settings folder.
+/.idea
+
 # Ignore datasets folder.
 /datasets
 

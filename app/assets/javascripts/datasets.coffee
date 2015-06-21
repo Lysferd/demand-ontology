@@ -4,23 +4,25 @@
 
 $ ->
   $( 'select#property' ).change ->
-    $( 'a[data-label]' ).data 'label', $('select#property :selected').text()
-    $( 'a[data-property]' ).data 'property', $( 'select#property :selected' ).val()
+    values = $('select#property :selected').val().split ':'
+    $('a[data-property]').data 'type', values[0]
+    $('a[data-property]').data 'property', values[1]
 
   $( 'a[data-property]' ).click ->
-    label = $( @ ).data( 'label' )
-    property = $( @ ).data( 'property' )
+    dataset_id = $(@).data 'dataset-id'
+    type = $(@).data 'type'
+    property = $(@).data 'property'
 
-    if !!$( 'input#individual_' + property ).length
-      alert 'A propriedade "' + label + '" já está presente no formulário.'
+    if !!$('label[for=individual_property_' + property + ']').length
+      alert 'A propriedade "' + property + '" já está presente no formulário.'
 
     else if property == $( 'select#property :first').text() or property == null
       alert 'Nenhuma propriedade foi selecionada.'
-    
+
     else
       $.ajax {
         type: 'PUT',
         url: '/add_property',
         dataType: 'script',
-        data: { label: label, property: property }
+        data: {dataset_id: dataset_id, type: type, property: property}
       }

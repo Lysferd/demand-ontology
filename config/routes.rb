@@ -24,6 +24,8 @@ Rails.application.routes.draw do
     get 'edit_individual/:id/:name' => :edit_individual, as: 'edit_individual'
     post 'update_individual' => :update_individual
 
+    get 'show_individual/:id/:name' => :show_individual, as: 'show_individual'
+
     delete 'destroy_individual/:id/:name' => :destroy_individual, as: 'destroy_individual'
   end
 
