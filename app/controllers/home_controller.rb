@@ -12,7 +12,8 @@ class HomeController < ApplicationController
   end
 
   def create_session
-    if user = User::authenticate( params[:email], params[:password] )
+    user = User::authenticate(params[:email], params[:password])
+    if user
       if params[:remember]
         cookies.permanent[:auth_token] = user.auth_token
       else

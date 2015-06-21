@@ -1,3 +1,8 @@
 %tr
-  %td= label_tag "individual[property][#{property}]", label + ':'
-  %td= text_field_tag "individual[property][#{property}]"
+  %td= label_tag "individual[property][#{type}:#{property}]", property.gsub(/_/,' ').titleize + ':'
+  %td
+    - if type =~ /resource/i
+      = select_tag "individual[property][#{type}:#{property}]",
+        individuals, { prompt: 'Selecione um indivíduo' }
+    - else
+      = text_field_tag "individual[property][#{type}:#{property}]"

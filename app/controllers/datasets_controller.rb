@@ -12,6 +12,8 @@ class DatasetsController < ApplicationController
     dataset = Dataset::find_by_id( params[:id] )
     @classes = dataset.classes
     @properties = dataset.properties
+
+    @individuals = dataset.individuals
   end
 
   #============================================================================
@@ -21,7 +23,7 @@ class DatasetsController < ApplicationController
   def create_individual
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     dataset.create_individual( params[:individual] )
-    redirect_to dataset
+    redirect_to show_individual_path(dataset, params[:individual][:name])
   end
   
   #============================================================================
@@ -29,8 +31,10 @@ class DatasetsController < ApplicationController
   # * Places a specific property field to create/update individual form.
   #============================================================================
   def add_property
-    @label = params[:label]
-    @property = params[:property]
+    @type, @property = params[:type], params[:property]
+    if @type == 'resource'
+      @individuals = Dataset::find_by_id(params[:dataset_id]).individuals
+    end
   end
 
   #============================================================================
@@ -38,10 +42,8 @@ class DatasetsController < ApplicationController
   # * Creates a form page for updating an individual's properties.
   #============================================================================
   def edit_individual
-    dataset = Dataset::find_by_id( params[:id] )
-    @individual = dataset.find_individual( params[:name] )
-    @classes = dataset.classes
-    @properties = dataset.properties
+    @dataset = Dataset::find_by_id(params[:id])
+    @individual = @dataset.find_individual(params[:name])
   end
 
   #============================================================================
@@ -51,7 +53,16 @@ class DatasetsController < ApplicationController
   def update_individual
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     dataset.update_individual( params[:individual] )
-    redirect_to dataset
+    redirect_to show_individual_path(dataset, params[:individual][:name])
+  end
+
+  #============================================================================
+  # GET /show_individual
+  # * Shows property details of an individual.
+  #============================================================================
+  def show_individual
+    @dataset = Dataset::find_by_id(params[:id])
+    @individual = @dataset.find_individual(params[:name])
   end
 
   #============================================================================

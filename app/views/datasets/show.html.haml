@@ -25,6 +25,7 @@
       %td= "#{@dataset.count} / #{@dataset.count_rdf}"
       %td= @dataset.individuals.to_a.size
       %td
+        = button_get 'Adicionar Indivíduo', new_individual_path( @dataset )
         = button_get 'Editar', edit_dataset_path( @dataset )
         = button_delete 'Excluir', @dataset
 %p
@@ -35,23 +36,22 @@
   %thead
     %th
       Nome do Indivíduo
-    /%th
-    /Classe do Indivíduo
+    %th
+      Classe do Indivíduo
     %th
       Opções
 
   %tbody
     - for individual in @dataset.individuals do
       %tr
-        %td= individual
-        /%td
-        /= individual.get_ont_class.to_s rescue individual.list_properties.map { |o| o.to_s }
-        /- individual.list_ont_classes( true ).map do |c|
-        /- unless c.get_local_name =~ /namedindividual/i
-        /= c.to_s #get_local_name
+        %td= individual.local_name.gsub( /_/, ' ' )
         %td
-          = button_get 'Editar', edit_individual_path( @dataset, individual )
-          = button_delete 'Excluir', destroy_individual_path( @dataset, individual )
+          - individual.list_ont_classes(true).map do | m |
+            - unless m.local_name =~ /NamedIndividual/
+              = m.local_name.gsub( /_/, ' ' ).titleize
+        %td
+          = button_get 'Detalhes', show_individual_path( @dataset, individual.local_name )
+          = button_get 'Editar', edit_individual_path( @dataset, individual.local_name )
+          = button_delete 'Excluir', destroy_individual_path( @dataset, individual.local_name )
 
 %p
-  = button_get 'Adicionar Indivíduo', new_individual_path( @dataset )

@@ -194,24 +194,39 @@ class Dataset < ActiveRecord::Base
   def create_individual( args )
     datawrite do
       ont_class = model.get_ont_class( namespace + args[:class] )
+
       unless ont_class
         fail ArgumentError, 'Given ontology class does not exist.'
         tdb.abort
-      else
-        individual = model.create_individual( namespace + args[:name], ont_class )
       end
+
+      individual = model.create_individual(namespace + args[:name], ont_class)
 
       # -=-=-=-=-
       # Manually include individual in owl:NamedIndividual type.
       named_individual = model.create_class( owl_prefix + 'NamedIndividual' )
       model.create_individual( namespace + args[:name], named_individual )
 
-      if args[:property]
-        for key, value in args[:property] do
-          property = model.get_property( namespace + key )
-          individual.add_property( property, value )
+      for key, value in args[:property] do
+        property = model.get_property(namespace + key.split(':')[1])
+
+        if key =~ /resource/
+          resource = model.get_individual(namespace + value)
+        else
+          resource = case key
+                       when /int/ then
+                         model.create_typed_literal(value.to_i)
+                       when /float/ then
+                         model.create_typed_literal(value.to_f)
+                       when /literal/ then
+                         model.create_typed_literal(value.to_s)
+                       else
+                         model.create_literal(value)
+                     end
         end
-      end
+
+        individual.add_property(property, resource)
+      end if args[:property]
 
       tdb.commit
     end
@@ -231,18 +246,27 @@ class Dataset < ActiveRecord::Base
       ont_class = model.get_ont_class( namespace + args[:class] )
       individual.ont_class = ont_class unless individual.get_ont_class == ont_class
 
-      if args[:property]
-        for key, value in args[:property] do
-          property = model.get_property( namespace + key )
-          resource = ResourceFactory::create_plain_literal( value )
-          if individual.has_property?( property ) and
+      for key, value in args[:property] do
+        property = model.get_property(namespace + key.split(':')[1])
+
+        resource = case key
+                     when /int/ then
+                       ResourceFactory::create_typed_literal(value.to_i)
+                     when /float/ then
+                       ResourceFactory::create_typed_literal(value.to_f)
+                     when /literal/ then
+                       ResourceFactory::create_typed_literal(value.to_s)
+                     else
+                       model.get_individual(namespace + value)
+                   end
+
+        if individual.has_property?(property) and
             not individual.get_property_value( property ) == resource
-            individual.set_property_value( property, resource )
-          else
-            individual.add_property( property, resource )
-          end
+          individual.set_property_value(property, resource)
+        else
+          individual.add_property(property, resource)
         end
-      end
+      end if args[:property]
 
       tdb.commit
     end
@@ -265,7 +289,7 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def find_individual( name )
     model.list_individuals.each do | i |
-      return i if i.get_local_name == name
+      return i if i.local_name == name
     end
   end
 
@@ -273,16 +297,14 @@ class Dataset < ActiveRecord::Base
   # * Dataset Individual Array
   #============================================================================
   def individuals
-    return model.list_individuals.map do |i|
-      i.get_local_name
-    end.sort
+    model.list_individuals.to_a
   end
 
   #============================================================================
   # * Dataset Triple Count
   #============================================================================
   def count
-    dataread { tdb.get_default_model.size }
+    dataread { tdb.default_model.size }
   end
   
   #============================================================================
@@ -298,9 +320,7 @@ class Dataset < ActiveRecord::Base
   # properly removing the trailing namespace.
   #============================================================================
   def classes
-    return model.list_classes.to_a.collect do | c |
-      c.get_local_name
-    end.sort
+    model.list_classes.to_a
   end
 
   #============================================================================
@@ -316,18 +336,14 @@ class Dataset < ActiveRecord::Base
   # * Dataset Object Properties
   #============================================================================
   def object_properties
-    return model.list_object_properties.to_a.collect do | prop |
-      prop.get_local_name
-    end.sort
+    return model.list_object_properties.to_a
   end
 
   #============================================================================
   # * Dataset Data(type) Properties
   #============================================================================
   def datatype_properties
-    return model.list_datatype_properties.to_a.collect do | prop |
-      prop.get_local_name
-    end.sort
+    return model.list_datatype_properties.to_a
   end
 
   #============================================================================
@@ -336,13 +352,13 @@ class Dataset < ActiveRecord::Base
   def query( string )
     prefixes = ''
 
-    rdf_model.get_ns_prefix_map.each_pair do | k, v |
+    rdf_model.ns_prefix_map.each_pair do |k, v|
       prefixes += "PREFIX #{k.empty? ? 'demand' : k}: <#{v}>\n"
     end
 
     q = QueryFactory::create( prefixes + string )
     dataread do
-      yield( QueryExecutionFactory::create( q, tdb.get_default_model ) )
+      yield(QueryExecutionFactory::create(q, tdb.default_model))
     end
   end
 

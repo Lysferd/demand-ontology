@@ -19,17 +19,33 @@
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
         %td= select_tag 'individual[class]',
-          select_helper( @classes, selected: @individual.ont_class.local_name )
+          select_helper( @dataset.classes, selected: @individual.ont_class.local_name )
 
         - @individual.list_properties.each do | property |
           - name = property.get_predicate.local_name
-          - next if name =~ /type/
+          - next if name == 'type'
           %tr
             %td= label_tag "individual[property][#{name}]", name.gsub( /_/, ' ' ).titleize + ':'
-            %td= text_field_tag "individual[property][#{name}]", property.get_resource
+            %td
+              - if property.object.resource?
+                - options = select_helper @dataset.individuals, selected: property.resource.local_name
+                = select_tag "individual[property][resource:#{name}]", options
+              - else
+                - if property.object.to_s =~ /int/i
+                  - type = 'int'
+                  - value = property.int
+                - elsif property.object.to_s =~ /literal/i
+                  - type = 'str'
+                  - value = property.string
+                - else
+                  - type = nil
+                  - value = property.object
+                = text_field_tag "individual[property][#{type}:#{name}]", value
+
       %tr
-        %td= select_tag 'property',
-          select_helper( @properties, prompt: 'Selecione propriedade' )
+        %td
+          - options = select_helper( @dataset.properties, prompt: 'Selecione propriedade' )
+          = select_tag 'property', options
         %td= link_to 'Adicionar Propriedade', '#', data: { label: nil, property: nil }
   %p
     = submit_tag 'Aplicar'

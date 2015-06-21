@@ -19,8 +19,8 @@
           select_helper( @classes, { prompt: 'Selecione uma classe' } )
       %tr
         %td= select_tag 'property',
-          select_helper( @properties, { prompt: 'Selecione propriedade' } )
-        %td= link_to 'Adicionar Propriedade', '#', data: { label: nil, property: nil }
+          select_properties( @properties ), { prompt: 'Selecione uma propriedade' }
+        %td= link_to 'Adicionar Propriedade', '#', data: { dataset_id: params[:id], type: nil, property: nil }
   %p
     = submit_tag 'Aplicar'
     = submit_tag 'Cancelar'
