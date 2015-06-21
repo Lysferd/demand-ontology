@@ -70,14 +70,14 @@ class Dataset < ActiveRecord::Base
   # dataset model from storing prefix values.
   #============================================================================
   def namespace
-    return rdf_model.get_ns_prefix_map['']
+    rdf_model.get_ns_prefix_map['']
   end
 
   #============================================================================
   # * Get OWL Prefix
   #============================================================================
   def owl_prefix
-    return rdf_model.get_ns_prefix_map['owl']
+    rdf_model.get_ns_prefix_map['owl']
   end
 
   #============================================================================
@@ -87,8 +87,9 @@ class Dataset < ActiveRecord::Base
     unless @rdf_model
       @rdf_model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
       Util::FileManager::get.read_model( @rdf_model, File::join( DATASET_FOLDER, self.name, self.rdf_source ) )
+      #@rdf_model.set_strict_mode( false )
     end
-    return @rdf_model
+    @rdf_model
   end
 
   #============================================================================
@@ -114,8 +115,9 @@ class Dataset < ActiveRecord::Base
         base_model = dataread { tdb.get_default_model }
       end
       @model = ModelFactory::create_ontology_model( spec, base_model )
+      @model.set_strict_mode( false )
     end
-    return @model
+    @model
   end
 
   #============================================================================
@@ -126,7 +128,7 @@ class Dataset < ActiveRecord::Base
       path = File::join( DATASET_FOLDER, self.name, 'tdb' )
       @tdb = TDBFactory::create_dataset( path )
     end
-    return @tdb
+    @tdb
   end
 
   #============================================================================
@@ -276,7 +278,7 @@ class Dataset < ActiveRecord::Base
   def destroy_individual( name )
     datawrite do
       individual = model.get_individual( namespace + name )
-      unless individual
+      if not individual
         tdb.abort
         fail ArgumentError, 'Given individual does not exist.'
       else
@@ -329,21 +331,21 @@ class Dataset < ActiveRecord::Base
   # properties from the model.
   #============================================================================
   def properties
-    return object_properties + datatype_properties
+    object_properties + datatype_properties
   end
 
   #============================================================================
   # * Dataset Object Properties
   #============================================================================
   def object_properties
-    return model.list_object_properties.to_a
+    model.list_object_properties.to_a
   end
 
   #============================================================================
   # * Dataset Data(type) Properties
   #============================================================================
   def datatype_properties
-    return model.list_datatype_properties.to_a
+    model.list_datatype_properties.to_a
   end
 
   #============================================================================

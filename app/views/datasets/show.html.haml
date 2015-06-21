@@ -45,10 +45,7 @@
     - for individual in @dataset.individuals do
       %tr
         %td= individual.local_name.gsub( /_/, ' ' )
-        %td
-          - individual.list_ont_classes(true).map do | m |
-            - unless m.local_name =~ /NamedIndividual/
-              = m.local_name.gsub( /_/, ' ' ).titleize
+        %td= ont_class( individual )
         %td
           = button_get 'Detalhes', show_individual_path( @dataset, individual.local_name )
           = button_get 'Editar', edit_individual_path( @dataset, individual.local_name )

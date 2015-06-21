@@ -20,5 +20,12 @@ module DatasetHelper
     options_for_select options
   end
 
+  def ont_class( individual )
+    individual.list_ont_classes( true ).map do | m |
+      return m.local_name.gsub( /_/, ' ' ).titleize unless m.local_name =~ /NamedIndividual/
+    end
+  rescue
+    return $!.message
+  end
 
 end
