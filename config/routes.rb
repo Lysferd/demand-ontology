@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # Define HTTP GET/POST Routes:
   controller :home do
     get 'index' => :index
+    get 'ontograf' => :ontograf
     get 'query' => :query
     post 'query' => :query_results
 

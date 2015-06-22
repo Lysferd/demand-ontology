@@ -14,12 +14,12 @@
 	color: #FFF;
   
   #logo {
-	  float: right;
-	  padding-right: 30px;
-	  height: 100%;
-  
+    float: right;
+    padding-right: 30px;
+    height: 100%;
+
     img {
-    	height: inherit;
+      height: inherit;
     }
   }
   
@@ -43,9 +43,16 @@
   background-color: #2419B2;
   
   vertical-align: middle;
- 	text-align: center;
+  text-align: center;
   font-family: Verdana, Geneva, sans-serif;
   color: #FFF;
+
+  iframe {
+    border: none;
+    top: 0;
+    width: inherit;
+    height: 94%;
+  }
 
   nav {
     margin-bottom: 12px;
