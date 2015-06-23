@@ -7,8 +7,11 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignoe RubyMine's settings folder.
+# Ignore RubyMine's settings folder.
 /.idea
+
+# Ignore downloads folder (used by JenaJRuby gem).
+/downloads
 
 # Ignore datasets folder.
 /datasets

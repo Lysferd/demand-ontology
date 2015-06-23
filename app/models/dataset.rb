@@ -7,7 +7,7 @@ class Dataset < ActiveRecord::Base
   #-=-=-=-=-=-=-
   # Module Mixins
   include Jena
-  include Core, TDB, Query, Ont
+  include Core, TDB, Query, Ont, Reasoner
 
   #-=-=-=-=-=-=-
   # Constants
@@ -346,6 +346,21 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def datatype_properties
     model.list_datatype_properties.to_a
+  end
+
+  #============================================================================
+  # * Reasoner Inferences
+  #============================================================================
+  def reason( resource_name )
+    schema = ModelFactory::create_default_model
+    schema.read( 'http://www.w3.org/2002/07/owl' )
+    reasoner = ReasonerRegistry::get_owl_reasoner
+    reasoner.bind_schema( schema )
+
+    infmodel = ModelFactory::create_inf_model( reasoner, model )
+    resource = infmodel.get_resource( namespace + resource_name )
+
+    infmodel.list_statements( resource, nil, nil )
   end
 
   #============================================================================

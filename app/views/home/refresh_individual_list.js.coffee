@@ -1,0 +1,1 @@
+$( 'form#reasoner select#individual_name' ).html '<%= select_helper( @individuals ) %>'

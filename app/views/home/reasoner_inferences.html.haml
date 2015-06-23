@@ -1,0 +1,34 @@
+= content_for( :subtitle ) do
+  Inferências
+
+%table
+  %thead
+    %th
+      Dataset
+    %th
+      Individual
+  %tbody
+    %tr
+      %td= @dataset_name
+      %td= @individual_name
+%p
+
+%table
+  %caption
+    Inferências:
+  %theader
+    %th
+      Sujeito
+    %th
+      Predicado
+    %th
+      Objeto
+  %tbody
+    - @inferences.each do | i |
+      %tr
+        %td= i.subject.local_name
+        %td= i.predicate.local_name
+        - if i.object.literal
+          %td= i.object
+        - else
+          %td= i.object.local_name

@@ -1,0 +1,16 @@
+= content_for( :subtitle ) do
+  OWL Reasoner
+
+= form_tag( 'reasoner', id: 'reasoner' ) do
+  %table
+    %tr
+      %td= label_tag :dataset_id, 'Ontologia:'
+      %td= select_tag :dataset_id,
+        options_from_collection_for_select( @datasets, :id, :name ),
+        { prompt: 'Selecione uma Ontologia' }
+    %tr
+      %td= label_tag :individual_name, 'Indivíduo:'
+      %td= select_tag :individual_name, '', { prompt: 'Nenhuma ontologia selecionada.' }
+    %tr
+      %td( colspan = 2 )
+        = submit_tag 'Realizar Inferências'

@@ -10,8 +10,15 @@ Rails.application.routes.draw do
   controller :home do
     get 'index' => :index
     get 'ontograf' => :ontograf
+
+    # Define routes for querying:
     get 'query' => :query
     post 'query' => :query_results
+
+    # Define routes for reasoning:
+    get 'reasoner' => :reasoner
+    post 'reasoner' => :reasoner_inferences
+    put 'refresh_individual_list' => :refresh_individual_list
 
     get 'login' => :login
     post 'login' => :create_session
