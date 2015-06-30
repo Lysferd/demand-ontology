@@ -258,11 +258,11 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def update_individual( args )
     datawrite do
-      individual = model.get_individual( namespace + args[:original_name] )
+      individual = model.get_individual( irify( args[:original_name] ) )
 
       unless args[:original_name] == args[:name]
-        Util::ResourceUtils::rename_resource( individual, namespace + args[:name] )
-        individual = model.get_individual( namespace + args[:name] )
+        Util::ResourceUtils::rename_resource( individual, irify( args[:name] ) )
+        individual = model.get_individual( irify( args[:name] ) )
       end
 
       # FIXME: sometimes the owl:NamedIndividual class gets in the way.
@@ -310,10 +310,17 @@ class Dataset < ActiveRecord::Base
   end
 
   #============================================================================
-  def find_individual( name )
+  def find_individual_by_name( name )
     model.list_individuals.each do | i |
       return i if i.local_name == name
     end
+  end
+
+  #============================================================================
+  def find_individuals_by_class( ontclass )
+    model.list_individuals.map do |i|
+      i.has_ont_class?( irify( ontclass ) ) ? i : nil
+    end.compact
   end
 
   #============================================================================
@@ -321,6 +328,18 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def individuals
     model.list_individuals.to_a
+  end
+
+  #============================================================================
+  def feeders
+    find_individuals_by_class( 'Alimentadores' ).map do |f|
+      f.local_name
+    end.sort
+  end
+
+  #============================================================================
+  def building_systems
+    find_individuals_by_class( 'Sistemas_Prediais' )
   end
 
   #============================================================================
@@ -344,6 +363,13 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def classes
     model.list_classes.to_a
+  end
+
+  #============================================================================
+  def find_class( name )
+    model.list_classes.to_a.each do |c|
+      return c if c.local_name == name
+    end
   end
 
   #============================================================================

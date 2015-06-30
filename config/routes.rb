@@ -11,32 +11,40 @@ Rails.application.routes.draw do
     get 'index' => :index
     get 'ontograf' => :ontograf
 
-    # Define routes for querying:
-    get 'query' => :query
-    post 'query' => :query_results
-
-    # Define routes for reasoning:
-    get 'reasoner' => :reasoner
-    post 'reasoner' => :reasoner_inferences
-    put 'refresh_individual_list' => :refresh_individual_list
-
     get 'login' => :login
     post 'login' => :create_session
     delete 'logout' => :destroy_session
   end
 
   controller :datasets do
-    get 'new_individual/:id' => :new_individual, as: 'new_individual'
-    post 'create_individual' => :create_individual
+    # -=-=-=-=-
+    # Define routes for Feeders:
+    get 'new_feeder/:id' => :new_feeder, as: 'new_feeder'
+    get 'edit_feeder/:id/:name' => :edit_feeder, as: 'edit_feeder'
+    get 'show_feeder/:id/:name' => :show_feeder, as: 'show_feeder'
+    post 'create_feeder' => :create_feeder
+    post 'update_feeder' => :update_feeder
+    delete 'destroy_feeder/:id/:name' => :destroy_feeder, as: 'destroy_feeder'
 
-    get 'edit_individual/:id/:name' => :edit_individual, as: 'edit_individual'
-    post 'update_individual' => :update_individual
+    # -=-=-=-=-
+    # Define routes for Building Systems:
+    get 'new_building_system/:id' => :new_building_system, as: 'new_building_system'
+    get 'edit_building_system/:id/:name' => :edit_building_system, as: 'edit_building_system'
+    get 'show_building_system/:id/:name' => :show_building_system, as: 'show_building_system'
+    post 'create_building_system' => :create_building_system
+    post 'update_building_system' => :update_building_system
+    delete 'destroy_building_system/:id/:name' => :destroy_building_system, as: 'destroy_building_system'
 
-    get 'show_individual/:id/:name' => :show_individual, as: 'show_individual'
+    # -=-=-=-=-
+    # Define routes for querying:
+    get 'query/:id' => :query
+    post 'query' => :query_results
 
-    delete 'destroy_individual/:id/:name' => :destroy_individual, as: 'destroy_individual'
+    # -=-=-=-=-
+    # Define routes for reasoning:
+    get 'reasoner/:id' => :reasoner
+    post 'reasoner' => :reasoner_inferences
   end
-
 
   # -=-=-=-=-
   # Define AJAX Requests:
@@ -45,5 +53,5 @@ Rails.application.routes.draw do
 
   # -=-=-=-=-
   # Define ROOT Route:
-  root to: 'home#index'
+  root to: 'datasets#index'
 end

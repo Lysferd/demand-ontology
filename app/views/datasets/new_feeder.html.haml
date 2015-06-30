@@ -1,7 +1,7 @@
 = content_for( :subtitle ) do
-  Criando Indivíduo
+  Criando Alimentador
 
-= form_tag( 'create_individual', id: 'new_individual' ) do
+= form_tag( :create_feeder ) do
   = hidden_field_tag 'individual[dataset_id]', params[:id]
   %table
     %thead
@@ -15,7 +15,9 @@
         %td= text_field_tag 'individual[name]'
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
-        %td= select_tag 'individual[class]',
+        %td= text_field_tag 'individual[class]', @ontclass.local_name, readonly: true
+        /
+          select_tag 'individual[class]',
           select_helper( @classes, { prompt: 'Selecione uma classe' } )
       %tr
         %td= select_tag 'property',

@@ -21,18 +21,19 @@
         %p= flash[:notice]
 
     #spinner( hidden = true )
-      %p= image_tag( 'spinner.gif' )
-    /%br/
-    /Loading...
+      %p
+        = image_tag( 'spinner.gif' )
+        %br/
+        Carregando...
 
     #contents
       - if current_user
         %nav
           %ul
             %li= link_to( 'Datasets', datasets_path )
-            %li= link_to( 'OntoGraf', ontograf_path )
-            %li= link_to( 'Reasoner', reasoner_path )
-            %li= link_to( 'Executar Query', query_path )
+            /%li= link_to( 'OntoGraf', ontograf_path )
+            /%li= link_to( 'Reasoner', reasoner_path )
+            /%li= link_to( 'Executar Query', query_path )
             %li= link_to( 'Usuários', users_path )
             %li= link_to( 'Sair', logout_path, method: :delete )
       = yield
@@ -41,9 +42,9 @@
       #copyright
         Sistema de Ontologias de Demanda
         %sub
-          v1.1
+          v1.2
       #back-button
-        = button_get 'Voltar', :back
+        = button_get 'Voltar', (@back ? @back : :back)
       #links
         %span( title = 'E-mail de Contato' )
           = link_to image_tag('iconeemail.png'), 'mailto:carlosbarbosa1964@hotmail.com'

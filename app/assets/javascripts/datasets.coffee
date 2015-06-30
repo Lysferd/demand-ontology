@@ -3,7 +3,7 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
 $ ->
-  $( 'form#new_individual select#property' ).change ->
+  $( 'select#property' ).change ->
     values = $('select#property :selected').val().split ':'
     $('a[data-property]').data 'type', values[0]
     $('a[data-property]').data 'property', values[1]
@@ -13,8 +13,6 @@ $ ->
     dataset_id = $(@).data 'dataset-id'
     type = $(@).data 'type'
     property = $(@).data 'property'
-
-    console.log $(@).data()
 
     if !!$('label[for="individual_property_' + type + ':' + property + '"]').length
       alert 'A propriedade "' + property + '" já está presente no formulário.'

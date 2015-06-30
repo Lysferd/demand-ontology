@@ -2,30 +2,51 @@
 
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
-  before_filter :check_cancel, only: [ :create, :update, :create_individual, :update_individual ]
+  before_filter :check_cancel, only: [ :create, :update, :create_feeder, :update_feeder ]
 
   #============================================================================
-  # GET /new_individual
-  # * Creates a form page for the creation of individuals.
+  # GET /new_feeder
+  # * Creates a form page for the creation of Feeders.
   #============================================================================
-  def new_individual
+  def new_feeder
     dataset = Dataset::find_by_id( params[:id] )
-    @classes = dataset.classes
+    @ontclass = dataset.find_class( 'Alimentadores' )
     @properties = dataset.properties
-
     @individuals = dataset.individuals
   end
 
   #============================================================================
-  # POST /create_individual
+  # POST /create_feeder
   # * Creates a new individual based on the parameters given.
   #============================================================================
-  def create_individual
+  def create_feeder
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    individual = dataset.create_individual( params[:individual] )
-    redirect_to show_individual_path( dataset, individual.local_name )
+    feeder = dataset.create_individual( params[:individual] )
+    redirect_to show_feeder_path( dataset, feeder.local_name )
   end
-  
+
+  #============================================================================
+  # GET /edit_feeder
+  # * Creates a form page for updating an individual's properties.
+  #============================================================================
+  def edit_feeder
+    @dataset = Dataset::find_by_id(params[:id] )
+    @individual = @dataset.find_individual_by_name(params[:name])
+    @ont_class = @individual.list_ont_classes(true).map do |c|
+      !(c.local_name =~ /NamedIndividual/) ? c : nil
+    end.compact[0]
+  end
+
+  #============================================================================
+  # POST /update_individual
+  # * Updates an existing individual's properties.
+  #============================================================================
+  def update_feeder
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
+    dataset.update_individual( params[:individual] )
+    redirect_to show_feeder_path( dataset, params[:individual][:name] )
+  end
+
   #============================================================================
   # AJAX PUT /add_property
   # * Places a specific property field to create/update individual form.
@@ -38,41 +59,59 @@ class DatasetsController < ApplicationController
   end
 
   #============================================================================
-  # GET /edit_individual
-  # * Creates a form page for updating an individual's properties.
-  #============================================================================
-  def edit_individual
-    @dataset = Dataset::find_by_id(params[:id])
-    @individual = @dataset.find_individual(params[:name])
-  end
-
-  #============================================================================
-  # POST /update_individual
-  # * Updates an existing individual's properties.
-  #============================================================================
-  def update_individual
-    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    dataset.update_individual( params[:individual] )
-    redirect_to show_individual_path(dataset, params[:individual][:name])
-  end
-
-  #============================================================================
   # GET /show_individual
   # * Shows property details of an individual.
   #============================================================================
-  def show_individual
-    @dataset = Dataset::find_by_id(params[:id])
-    @individual = @dataset.find_individual(params[:name])
+  def show_feeder
+    @dataset = Dataset::find_by_id( params[:id] )
+    @individual = @dataset.find_individual_by_name( params[:name] )
+
+    @back = dataset_path( @dataset )
   end
 
   #============================================================================
   # DELETE /destroy_individual
   # * Deletes an individual and all references to it.
   #============================================================================
-  def destroy_individual
+  def destroy_feeder
     dataset = Dataset::find_by_id( params[:id] )
     dataset.destroy_individual( params[:name] )
     redirect_to dataset
+  end
+
+  #============================================================================
+  def reasoner
+    @dataset = Dataset::find_by_id( params[:id] )
+  end
+
+  #============================================================================
+  def reasoner_inferences
+    if params[:id].empty? or params[:individual_name].empty?
+      redirect_to( reasoner_path, notice: 'Nenhuma ontologia/indivíduo foi selecionado(a).' )
+    end
+
+    dataset = Dataset::find_by_id( params[:id] )
+    @dataset_name = dataset.name
+    @individual_name = params[:individual_name]
+
+    @inferences = dataset.reason( params[:individual_name] )
+  end
+
+  #============================================================================
+  def query
+    @dataset = Dataset::find_by_id( params[:id] )
+  end
+
+  #============================================================================
+  def query_results
+    if params[:id].empty?
+      redirect_to( query_path, notice: 'Nenhuma ontologia selecionada.' )
+      return
+    end
+
+    dataset = Dataset::find_by_id( params[:id] )
+    @results = dataset.query_to_array( params[:query] )
+    @query = params[:query]
   end
 
   #============================================================================
@@ -89,7 +128,6 @@ class DatasetsController < ApplicationController
   # GET /datasets.json
   def index
     @datasets = Dataset::all
-      #where( user_id: current_user.id )
   end
 
   # GET /datasets/1

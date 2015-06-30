@@ -1,7 +1,7 @@
 = content_for( :subtitle ) do
-  = "Editando #{@individual.get_local_name}"
+  = "Editando #{@individual.local_name}"
 
-= form_tag( '/update_individual' ) do
+= form_tag( :update_feeder ) do
   = hidden_field_tag 'individual[dataset_id]', params[:id]
   = hidden_field_tag 'individual[original_name]', params[:name]
 
@@ -18,7 +18,9 @@
         %td= text_field_tag 'individual[name]', @individual.local_name
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
-        %td= select_tag 'individual[class]',
+        %td= text_field_tag 'individual[class]', @ont_class.local_name, readonly: true
+        /
+          select_tag 'individual[class]',
           select_helper( @dataset.classes, selected: @individual.ont_class.local_name )
 
         - @individual.list_properties.each do | property |

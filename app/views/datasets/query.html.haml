@@ -2,10 +2,7 @@
   Executar Query SPARQL
   
 = form_tag( 'query' ) do
-  %p
-    = select_tag :dataset_id,
-      options_from_collection_for_select( @datasets, :id, :name ),
-      { prompt: 'Selecione uma Ontologia' }
+  = hidden_field_tag :id, value: params[:id]
   %p
     = text_area_tag :query, nil, size: '50x10'
   %p
