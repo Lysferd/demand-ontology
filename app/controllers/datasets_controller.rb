@@ -80,31 +80,31 @@ class DatasetsController < ApplicationController
   end
 
   #============================================================================
-  # GET /new_feeder
+  # GET /new_building_system
   # * Creates a form page for the creation of Feeders.
   #============================================================================
   def new_building_system
     dataset = Dataset::find_by_id( params[:id] )
-    @ontclass = dataset.find_class( 'Alimentadores' )
+    @ontclass = dataset.find_class( 'Sistema_Predial' )
     @properties = dataset.properties
     @individuals = dataset.individuals
   end
 
   #============================================================================
-  # POST /create_feeder
+  # POST /create_building_system
   # * Creates a new individual based on the parameters given.
   #============================================================================
-  def create_feeder
+  def create_building_system
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    feeder = dataset.create_individual( params[:individual] )
-    redirect_to show_feeder_path( dataset, feeder.local_name )
+    building_system = dataset.create_individual( params[:individual] )
+    redirect_to show_building_system_path( dataset, building_system.local_name )
   end
 
   #============================================================================
-  # GET /edit_feeder
+  # GET /edit_building_system
   # * Creates a form page for updating an individual's properties.
   #============================================================================
-  def edit_feeder
+  def edit_building_system
     @dataset = Dataset::find_by_id(params[:id] )
     @individual = @dataset.find_individual_by_name(params[:name])
     @ont_class = @individual.list_ont_classes(true).map do |c|
@@ -113,13 +113,34 @@ class DatasetsController < ApplicationController
   end
 
   #============================================================================
-  # POST /update_individual
+  # POST /update_building_system
   # * Updates an existing individual's properties.
   #============================================================================
-  def update_feeder
+  def update_building_system
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     dataset.update_individual( params[:individual] )
-    redirect_to show_feeder_path( dataset, params[:individual][:name] )
+    redirect_to show_building_system_path( dataset, params[:individual][:name] )
+  end
+
+  #============================================================================
+  # GET /show_building_system
+  # * Shows property details of an individual.
+  #============================================================================
+  def show_building_system
+    @dataset = Dataset::find_by_id( params[:id] )
+    @individual = @dataset.find_individual_by_name( params[:name] )
+
+    @back = dataset_path( @dataset )
+  end
+
+  #============================================================================
+  # DELETE /destroy_building_system
+  # * Deletes an individual and all references to it.
+  #============================================================================
+  def destroy_building_system
+    dataset = Dataset::find_by_id( params[:id] )
+    dataset.destroy_individual( params[:name] )
+    redirect_to dataset
   end
 
   #============================================================================

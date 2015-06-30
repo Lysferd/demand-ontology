@@ -377,7 +377,7 @@ class Dataset < ActiveRecord::Base
 
   #============================================================================
   def building_systems
-    find_individuals_by_class( 'Sistemas_Prediais' )
+    find_individuals_by_class( 'Sistema_Predial' )
   end
 
   #============================================================================

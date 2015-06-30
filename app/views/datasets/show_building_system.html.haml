@@ -1,0 +1,47 @@
+= content_for( :subtitle ) do
+  = "Detalhes de #{@individual.local_name}"
+
+%table
+  %caption
+    Informações Básicas
+  %thead
+    %th
+      Nome do Alimentador
+    %th
+      Classes do Alimentador
+
+  %tbody
+    %tr
+      %td= @individual.local_name
+      %td
+        - @individual.list_ont_classes(true).to_a.each do |c|
+          = c.local_name rescue $!.message
+          %br/
+
+%p
+  %table
+    %caption
+      Propriedades
+    %thead
+      %th
+        Tipo da Propriedade
+      %th
+        Valor da Propriedade
+    %tbody
+      - properties = @individual.list_properties.to_a
+      - if properties.empty?
+        %tr
+          %td
+            Alimentador não possui nenhuma propriedade!
+      - else
+        - properties.each do | property |
+          /- next if property.predicate.to_s =~ /type/
+          %tr
+            %td= property.predicate.local_name
+            %td= property.object.resource ? property.resource.local_name : property.string
+
+%p
+  = button_get 'Inferências', reasoner_path( @dataset, @individual.local_name )
+%p
+  = button_get 'Editar', edit_building_system_path( @dataset, @individual.local_name )
+  = button_delete 'Excluir', destroy_building_system_path( @dataset, @individual.local_name )

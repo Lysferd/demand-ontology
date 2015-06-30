@@ -89,6 +89,7 @@
     %tr
       %td( colspan = 2 )
         = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )
+        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Sistema_Predial' ).local_name )
 
 /
   %table
