@@ -44,9 +44,9 @@
 
       %tr
         %td
-          - options = select_helper( @dataset.properties, prompt: 'Selecione propriedade' )
-          = select_tag 'property', options
-        %td= link_to 'Adicionar Propriedade', '#', data: { label: nil, property: nil }
+          - options = select_properties( @dataset.properties )
+          = select_tag 'property', options, { prompt: 'Selecione uma propriedade' }
+        %td= link_to 'Adicionar Propriedade', '#', data: { dataset_id: params[:id], type: nil, property: nil }
   %p
     = submit_tag 'Aplicar'
     = submit_tag 'Cancelar'

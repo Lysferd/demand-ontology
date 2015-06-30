@@ -1,5 +1,4 @@
 !!! 5
-
 %html
   %head
     %title
@@ -20,6 +19,11 @@
     - if flash[:notice]
       #notice
         %p= flash[:notice]
+
+    #spinner( hidden = true )
+      %p= image_tag( 'spinner.gif' )
+    /%br/
+    /Loading...
 
     #contents
       - if current_user

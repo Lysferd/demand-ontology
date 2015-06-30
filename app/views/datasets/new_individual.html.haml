@@ -1,7 +1,7 @@
 = content_for( :subtitle ) do
   Criando Indivíduo
 
-= form_tag( '/create_individual' ) do
+= form_tag( 'create_individual', id: 'new_individual' ) do
   = hidden_field_tag 'individual[dataset_id]', params[:id]
   %table
     %thead

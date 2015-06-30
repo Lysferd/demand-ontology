@@ -22,8 +22,8 @@ class DatasetsController < ApplicationController
   #============================================================================
   def create_individual
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    dataset.create_individual( params[:individual] )
-    redirect_to show_individual_path(dataset, params[:individual][:name])
+    individual = dataset.create_individual( params[:individual] )
+    redirect_to show_individual_path( dataset, individual.local_name )
   end
   
   #============================================================================

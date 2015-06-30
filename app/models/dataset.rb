@@ -189,48 +189,69 @@ class Dataset < ActiveRecord::Base
     self.transaction( :write, &Proc::new )
   end
 
+  #============================================================================
+  # * IRI Value Generation
+  #  Helper method that generates a valid IRI value.
+  # Inside ontologies, individuals, classes and properties cannot have name
+  # values with space characters ' ', for they are displayed in the URI, and
+  # URIs cannot have spaces. Instead, spaces should be replaced by underscore
+  # characters '_'.
+  #============================================================================
+  def irify( local_name )
+    namespace + local_name.gsub( ?\s, ?_ )
+  end
+
   public
   #============================================================================
   # * Dataset Individual Creation
   #============================================================================
   def create_individual( args )
     datawrite do
-      ont_class = model.get_ont_class( namespace + args[:class] )
+
+      # -=-=-=-=-
+      ont_class_iri = irify( args[:class] )
+      ont_class = model.get_ont_class( ont_class_iri )
 
       unless ont_class
         fail ArgumentError, 'Given ontology class does not exist.'
         tdb.abort
       end
 
-      individual = model.create_individual(namespace + args[:name], ont_class)
+      # -=-=-=-=-
+      individual_iri = irify( args[:name] )
+      individual = model.create_individual( individual_iri, ont_class )
 
       # -=-=-=-=-
       # Manually include individual in owl:NamedIndividual type.
       named_individual = model.create_class( owl_prefix + 'NamedIndividual' )
-      model.create_individual( namespace + args[:name], named_individual )
+      model.create_individual( individual_iri, named_individual )
 
       for key, value in args[:property] do
-        property = model.get_property(namespace + key.split(':')[1])
+        property_iri = irify( key.split( ?: )[1] )
+        property = model.get_property( property_iri )
 
         if key =~ /resource/
-          resource = model.get_individual(namespace + value)
+          resource_iri = irify( value )
+          resource = model.get_individual( resource_iri )
         else
           resource = case key
                        when /int/ then
-                         model.create_typed_literal(value.to_i)
+                         model.create_typed_literal( value.to_i )
                        when /float/ then
-                         model.create_typed_literal(value.to_f)
+                         model.create_typed_literal( value.to_f )
                        when /literal/ then
-                         model.create_typed_literal(value.to_s)
+                         model.create_typed_literal( value.to_s )
                        else
-                         model.create_literal(value)
+                         model.create_literal( value )
                      end
         end
 
-        individual.add_property(property, resource)
+        individual.add_property( property, resource )
       end if args[:property]
 
       tdb.commit
+
+      return individual
     end
   end
 

@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/Lysferd/jena-jruby.git
-  revision: 19640c227c93bed97de6a9f38e21d5c0ff3e13a9
+  revision: d10cdcb45963a0f176421cf204153c4450354d79
   specs:
     jena-jruby (0.8.0-java)
       builder
