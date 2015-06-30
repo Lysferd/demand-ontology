@@ -80,6 +80,49 @@ class DatasetsController < ApplicationController
   end
 
   #============================================================================
+  # GET /new_feeder
+  # * Creates a form page for the creation of Feeders.
+  #============================================================================
+  def new_building_system
+    dataset = Dataset::find_by_id( params[:id] )
+    @ontclass = dataset.find_class( 'Alimentadores' )
+    @properties = dataset.properties
+    @individuals = dataset.individuals
+  end
+
+  #============================================================================
+  # POST /create_feeder
+  # * Creates a new individual based on the parameters given.
+  #============================================================================
+  def create_feeder
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
+    feeder = dataset.create_individual( params[:individual] )
+    redirect_to show_feeder_path( dataset, feeder.local_name )
+  end
+
+  #============================================================================
+  # GET /edit_feeder
+  # * Creates a form page for updating an individual's properties.
+  #============================================================================
+  def edit_feeder
+    @dataset = Dataset::find_by_id(params[:id] )
+    @individual = @dataset.find_individual_by_name(params[:name])
+    @ont_class = @individual.list_ont_classes(true).map do |c|
+      !(c.local_name =~ /NamedIndividual/) ? c : nil
+    end.compact[0]
+  end
+
+  #============================================================================
+  # POST /update_individual
+  # * Updates an existing individual's properties.
+  #============================================================================
+  def update_feeder
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
+    dataset.update_individual( params[:individual] )
+    redirect_to show_feeder_path( dataset, params[:individual][:name] )
+  end
+
+  #============================================================================
   def reasoner
     @dataset = Dataset::find_by_id( params[:id] )
   end

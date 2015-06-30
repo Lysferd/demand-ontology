@@ -42,22 +42,30 @@
     %th
       Nome
     %th
+      Potencia
+    %th
       Opções
   %tbody
     - feeders = @dataset.feeders
     - if feeders.empty?
       %tr
-        %td( colspan = 2)
+        %td( colspan = 3)
           Nenhum alimentador está presente na ontologia!
     - else
       - for feeder in feeders do
         %tr
-          %td= feeder
-          %td= button_get 'Detalhes', show_feeder_path( @dataset, feeder )
+          %td= feeder.local_name
+          %td= @dataset.get_demand( feeder ) ? @dataset.get_demand( feeder ).get_int.to_s + ' W' : 'Não informado.'
+          %td= button_get 'Detalhes', show_feeder_path( @dataset, feeder.local_name )
     %tr
-      %td( colspan = 2 )
+      %td( colspan = 3 )
+        Potencia Total:
+        = @dataset.demand_sum
+        W
+    %tr
+      %td( colspan = 3 )
         = button_get 'Novo Alimentador', new_feeder_path( @dataset )
-        = button_get 'Inferências', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name )
+        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name )
 
 %table( style = "display: inline-block;" )
   %caption

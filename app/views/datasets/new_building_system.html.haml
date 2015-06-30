@@ -1,0 +1,4 @@
+= content_for( :subtitle ) do
+  Criando Sistema Predial
+
+= render 'new_individual_form', route: :create_building_system, id: params[:id], ont_class: @ontclass.local_name, properties: @properties

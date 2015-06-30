@@ -1,28 +1,4 @@
 = content_for( :subtitle ) do
   Criando Alimentador
 
-= form_tag( :create_feeder ) do
-  = hidden_field_tag 'individual[dataset_id]', params[:id]
-  %table
-    %thead
-      %th
-        Propriedade
-      %th
-        Valor
-    %tbody
-      %tr
-        %td= label_tag 'individual[name]', 'Nome:'
-        %td= text_field_tag 'individual[name]'
-      %tr
-        %td= label_tag 'individual[class]', 'Classe:'
-        %td= text_field_tag 'individual[class]', @ontclass.local_name, readonly: true
-        /
-          select_tag 'individual[class]',
-          select_helper( @classes, { prompt: 'Selecione uma classe' } )
-      %tr
-        %td= select_tag 'property',
-          select_properties( @properties ), { prompt: 'Selecione uma propriedade' }
-        %td= link_to 'Adicionar Propriedade', '#', data: { dataset_id: params[:id], type: nil, property: nil }
-  %p
-    = submit_tag 'Aplicar'
-    = submit_tag 'Cancelar'
+= render 'new_individual_form', route: :create_feeder, id: params[:id], ont_class: @ontclass.local_name, properties: @properties

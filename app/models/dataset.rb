@@ -29,6 +29,11 @@ class Dataset < ActiveRecord::Base
       {
           description: 'Apresentar propriedades distintas de um indivíduo de uma classe (substituir [myclass] pelo nome da classe):',
           query: 'SELECT DISTINCT ?o ?p ?v WHERE { ?o a demand:[myclass] . ?o ?p ?v . }'
+      },
+
+      {
+          description: 'Soma de todas as potências de todos os Alimentadores:',
+          query: 'SELECT (SUM(?value) AS ?summedval) WHERE { ?object ?property ?value . ?object a demand:Alimentadores . ?object demand:Potencia_total ?value . }'
       }
   ]
 
@@ -351,9 +356,23 @@ class Dataset < ActiveRecord::Base
 
   #============================================================================
   def feeders
-    find_individuals_by_class( 'Alimentadores' ).map do |f|
-      f.local_name
-    end.sort
+    find_individuals_by_class( 'Alimentadores' )
+  end
+
+  #============================================================================
+  def get_demand( individual )
+    property = model.get_property( irify( 'Potencia_total' ) )
+    individual.get_property( property )
+  end
+
+  #============================================================================
+  def demand_sum
+    sum = 0
+    for feeder in feeders do
+      next unless get_demand( feeder )
+      sum += get_demand( feeder ).get_int
+    end
+    sum
   end
 
   #============================================================================
