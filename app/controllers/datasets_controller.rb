@@ -86,20 +86,20 @@ class DatasetsController < ApplicationController
 
   #============================================================================
   def reasoner_inferences
-    if params[:id].empty? or params[:individual_name].empty?
-      redirect_to( reasoner_path, notice: 'Nenhuma ontologia/indivíduo foi selecionado(a).' )
+    if not params[:id] or not params[:name]
+      redirect_to( reasoner_path, notice: 'Nenhuma ontologia foi selecionado(a).' )
     end
-
     dataset = Dataset::find_by_id( params[:id] )
     @dataset_name = dataset.name
-    @individual_name = params[:individual_name]
-
-    @inferences = dataset.reason( params[:individual_name] )
+    @individual_name = params[:name]
+    @inferences = dataset.reason( params[:name] )
   end
 
   #============================================================================
   def query
     @dataset = Dataset::find_by_id( params[:id] )
+
+    @back = dataset_path( params[:id] )
   end
 
   #============================================================================
@@ -133,6 +133,7 @@ class DatasetsController < ApplicationController
   # GET /datasets/1
   # GET /datasets/1.json
   def show
+    @back = datasets_path
   end
 
   # GET /datasets/new
@@ -197,8 +198,8 @@ class DatasetsController < ApplicationController
   def check_cancel
     return unless params[:commit] == 'Cancelar'
 
-    if params[:action] =~ /individual/
-      redirect_to( dataset_path( params[:individual][:dataset_id] ) )
+    if params[:action] =~ /update/
+      redirect_to( dataset_path( params[:id] ) )
     else
       redirect_to( datasets_path )
     end

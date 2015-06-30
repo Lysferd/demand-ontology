@@ -1,3 +1,5 @@
+# Encoding: UTF-8
+
 class Dataset < ActiveRecord::Base
 
   #-=-=-=-=-=-=-
@@ -12,6 +14,23 @@ class Dataset < ActiveRecord::Base
   #-=-=-=-=-=-=-
   # Constants
   DATASET_FOLDER = File::join( Dir::pwd, 'datasets' )
+
+  SPARQL_TEMPLATES = [
+      {
+          description: 'Apresentar todas as classes:',
+          query: 'SELECT ?class WHERE { ?class a owl:Class }'
+      },
+
+      {
+          description: 'Apresentar todos os indivíduos pertencentes à classe determinada (substituir [myclass] pelo nome da classe):',
+          query: 'SELECT ?individual WHERE { ?individual rdf:type demand:[myclass] }'
+      },
+
+      {
+          description: 'Apresentar propriedades distintas de um indivíduo de uma classe (substituir [myclass] pelo nome da classe):',
+          query: 'SELECT DISTINCT ?o ?p ?v WHERE { ?o a demand:[myclass] . ?o ?p ?v . }'
+      }
+  ]
 
   #-=-=-=-=-=-=-
   # Callbacks

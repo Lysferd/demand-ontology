@@ -1,9 +1,23 @@
 = content_for( :subtitle ) do
   Executar Query SPARQL
-  
-= form_tag( 'query' ) do
+
+= form_tag( :query ) do
   = hidden_field_tag :id, value: params[:id]
   %p
-    = text_area_tag :query, nil, size: '50x10'
+    = text_area_tag :query, nil, size: '50x10', id: :query
   %p
     = submit_tag 'Executar'
+
+%table
+  %caption
+    Exemplos de Queries
+  %thead
+    %th
+      Descrição:
+    %th
+      Query:
+  %tbody
+    - for template in Dataset::SPARQL_TEMPLATES do
+      %tr
+        %td= template[:description]
+        %td.template= template[:query]

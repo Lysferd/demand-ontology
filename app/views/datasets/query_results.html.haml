@@ -5,11 +5,12 @@
   Query inserida:
 %table
   %tr
-    %td=@query
+    %td= @query
 
 %p
   Resultado:
 %table
-  - @results.each do | result |
+  - for result in @results do
     %tr
-      %td= result
+      - for column in result.to_s.split( /(\(.*?\))/ ) do
+        %td= column

@@ -31,7 +31,7 @@
 
 %p
   = button_get 'Query', query_path( @dataset )
-  = button_get 'Reasoner', reasoner_path( @dataset )
+  /= button_get 'Inferências', reasoner_path( @dataset )
 
 %hr
 
@@ -57,6 +57,7 @@
     %tr
       %td( colspan = 2 )
         = button_get 'Novo Alimentador', new_feeder_path( @dataset )
+        = button_get 'Inferências', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name )
 
 %table( style = "display: inline-block;" )
   %caption
@@ -71,7 +72,7 @@
     - if building_systems.empty?
       %tr
         %td( colspan = 2)
-          Nenhum alimentador está presente na ontologia!
+          Nenhum sistema predial está presente na ontologia!
     - else
       - for building_system in building_systems do
         %tr

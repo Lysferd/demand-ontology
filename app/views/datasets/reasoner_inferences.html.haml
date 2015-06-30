@@ -29,6 +29,6 @@
         %td= i.subject.local_name
         %td= i.predicate.local_name
         - if i.object.literal
-          %td= i.object
+          %td= i.object.get_int rescue i.object
         - else
           %td= i.object.local_name

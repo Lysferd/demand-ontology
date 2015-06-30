@@ -3,6 +3,11 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
 $ ->
+  $( 'td.template' ).click ->
+    console.log $(@).text()
+    console.log $( 'textarea#query' ).val()
+    $( 'textarea#query' ).val $(@).text()
+
   $( 'select#property' ).change ->
     values = $('select#property :selected').val().split ':'
     $('a[data-property]').data 'type', values[0]

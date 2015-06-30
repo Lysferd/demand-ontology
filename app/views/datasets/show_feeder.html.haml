@@ -41,5 +41,7 @@
             %td= property.object.resource ? property.resource.local_name : property.string
 
 %p
+  = button_get 'Inferências', reasoner_path( @dataset, @individual.local_name )
+%p
   = button_get 'Editar', edit_feeder_path( @dataset, @individual.local_name )
   = button_delete 'Excluir', destroy_feeder_path( @dataset, @individual.local_name )
