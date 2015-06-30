@@ -1,0 +1,35 @@
+#spinner {
+  position: fixed;
+
+  margin: 0;
+  padding: 0;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+
+  background: rgba( 178, 223, 219, 0.7 );
+  
+  p {
+    img {
+      width: 20px;
+      height: 20px;
+    }
+
+    position: relative;
+    height: inherit;
+    font-weight: bold;
+    text-align: center;
+    //top: 50%;
+    -webkit-transform: translateY( 50% );
+    -moz-transform: translateY( 50% );
+    -ms-transform: translateY( 50% );
+    -o-transform: translateY( 50% );
+    transform: translateY( 50% );
+    
+    color: white;
+    text-shadow: -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 1px 1px 0 #000;
+  }
+}
