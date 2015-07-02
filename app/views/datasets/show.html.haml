@@ -65,7 +65,7 @@
     %tr
       %td( colspan = 3 )
         = button_get 'Novo Alimentador', new_feeder_path( @dataset )
-        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name )
+        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name ) rescue nil
 
 %table( style = "display: inline-block;" )
   %caption
@@ -89,7 +89,7 @@
     %tr
       %td( colspan = 2 )
         = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )
-        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Sistema_Predial' ).local_name )
+        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Sistema_Predial' ).local_name ) rescue nil
 
 /
   %table

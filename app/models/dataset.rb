@@ -5,9 +5,11 @@ class Dataset < ActiveRecord::Base
   #-=-=-=-=-=-=-
   # Jena-JRuby Library
   require( 'jena_jruby' )
+  require( 'fileutils' )
 
   #-=-=-=-=-=-=-
   # Module Mixins
+  #include ActiveModel::Dirty
   include Jena
   include Core, TDB, Query, Ont, Reasoner
 
@@ -39,7 +41,8 @@ class Dataset < ActiveRecord::Base
 
   #-=-=-=-=-=-=-
   # Callbacks
-  before_create :generate_tdb
+  before_create :create_dataset
+  before_update :update_dataset
   before_destroy :destroy_tdb
 
   #-=-=-=-=-=-=-
@@ -51,32 +54,35 @@ class Dataset < ActiveRecord::Base
   # Table References
   belongs_to :user
 
+  #-=-=-=-=-=-=-
+  #define_attribute_method :name
+  #define_attribute_method :rdf_source
+
   private
   #============================================================================
   # *
   #============================================================================
-  def generate_tdb
-    self.name = self.name.downcase.split.join( '_' )
+  def create_dataset
+    # -=-=-=-=-
+    # Fixes possible issues with IRIs.
+    self.name.gsub!( ?\s, ?_ )
 
     # -=-=-=-=-
-    # Create folder for all datasets.
+    # Create Datasets folder.
     path = DATASET_FOLDER
     Dir::mkdir( path ) unless FileTest::exist?( path )
 
     # -=-=-=-=-
     # Create folder for this dataset.
-    # fixme: name cannot contain spaces
-    #   or they have to be escaped
     path += "/#{self.name}"
     Dir::mkdir( path ) unless FileTest::exist?( path )
 
     # -=-=-=-=-
     # Save uploaded RDF source file.
-    path += "/#{self.rdf_source[0].original_filename.downcase.split.join( '_' )}"
-    File::open( path, 'wb' ) do | rdf |
-      rdf.write( self.rdf_source[0].read )
-    end
-    self.rdf_source = self.rdf_source[0].original_filename.downcase.split.join( '_' )
+    model_filename = self.rdf_source[0].original_filename.gsub( ?\s, ?_ )
+    path += "/#{model_filename}"
+    upload_model( path, self.rdf_source[0] )
+    self.rdf_source = model_filename
 
     # -=-=-=-=-
     # Populate Dataset with the Ontology Model.
@@ -84,6 +90,51 @@ class Dataset < ActiveRecord::Base
       tdb.get_default_model.add( rdf_model )
       tdb.commit
     end
+
+  end
+
+  def update_dataset
+    if self.name_changed?
+      old_path = File::join( DATASET_FOLDER, self.changed_attributes[:name] )
+      new_path = File::join( DATASET_FOLDER, self.name )
+      FileUtils::mv( old_path, new_path )
+    end
+
+    # -=-=-=-=-
+    # Generate union model from existing model and new model.
+    if self.rdf_source_changed?
+      # do not create instance variable @rdf_model
+      base_model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
+      original_path = File::join( DATASET_FOLDER, self.name, self.changed_attributes[:rdf_source] )
+      Util::FileManager::get.read_model( base_model, original_path )
+
+      # The new model
+      model_filename = self.rdf_source[0].original_filename.gsub( ?\s, ?_ )
+      new_path = File::join( DATASET_FOLDER, self.name, model_filename )
+      upload_model( new_path, self.rdf_source[0] )
+      new_model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
+      Util::FileManager::get.read_model( new_model, new_path )
+      File::delete( new_path )
+
+      # Union model
+      union_model = ModelFactory::create_union( base_model, new_model )
+      out = java.io.FileOutputStream::new( original_path )
+      union_model.write( out )
+      out.close
+
+      # Only the model's contents change, so back to original name
+      self.rdf_source = self.changed_attributes[:rdf_source]
+
+      # Populate Dataset with the Ontology Model.
+      datawrite do
+        tdb.get_default_model.add( rdf_model )
+        tdb.commit
+      end
+    end
+  end
+
+  def upload_model( path, data )
+    File::open( path, 'wb' ) { | rdf | rdf.write( data.read ) }
   end
 
   public
