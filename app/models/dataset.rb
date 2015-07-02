@@ -95,6 +95,7 @@ class Dataset < ActiveRecord::Base
 
   def update_dataset
     if self.name_changed?
+      self.name.gsub!( ?\s, ?_ )
       old_path = File::join( DATASET_FOLDER, self.changed_attributes[:name] )
       new_path = File::join( DATASET_FOLDER, self.name )
       FileUtils::mv( old_path, new_path )
