@@ -9,6 +9,8 @@
       Nome do Alimentador
     %th
       Classes do Alimentador
+    %th
+      Opções
 
   %tbody
     %tr
@@ -17,6 +19,10 @@
         - @individual.list_ont_classes(true).to_a.each do |c|
           = c.local_name rescue $!.message
           %br/
+      %td
+        = button_get 'Inferências', reasoner_path( @dataset, @individual.local_name )
+        = button_get 'Editar', edit_feeder_path( @dataset, @individual.local_name )
+        = button_delete 'Excluir', destroy_feeder_path( @dataset, @individual.local_name )
 
 %p
   %table
@@ -35,13 +41,28 @@
             Alimentador não possui nenhuma propriedade!
       - else
         - properties.each do | property |
-          /- next if property.predicate.to_s =~ /type/
+          - next if property.predicate.to_s =~ /type/
           %tr
             %td= property.predicate.local_name
             %td= property.object.resource ? property.resource.local_name : property.string
 
 %p
-  = button_get 'Inferências', reasoner_path( @dataset, @individual.local_name )
-%p
-  = button_get 'Editar', edit_feeder_path( @dataset, @individual.local_name )
-  = button_delete 'Excluir', destroy_feeder_path( @dataset, @individual.local_name )
+  %table
+    %caption
+      Sistemas Prediais
+    %thead
+      %th
+        Nome
+      %th
+        Potência Total
+    %tbody
+      - building_systems = @dataset.find_individuals_by_feeder( @individual )
+      - if building_systems.empty?
+        %tr
+          %td( colspan = 2 )
+            Não há sistemas prediais interligados a este alimentador!
+      - else
+        - for individual in building_systems do
+          %tr
+            %td= individual.local_name
+            %td= @dataset.get_demand( individual ).get_int.to_s + 'W'

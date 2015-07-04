@@ -2,7 +2,6 @@
 
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
-  before_filter :check_cancel, only: [ :create, :update, :create_feeder, :update_feeder ]
 
   #============================================================================
   # GET /new_feeder
@@ -22,7 +21,11 @@ class DatasetsController < ApplicationController
   def create_feeder
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     feeder = dataset.create_individual( params[:individual] )
-    redirect_to show_feeder_path( dataset, feeder.local_name )
+    if feeder
+      redirect_to show_feeder_path( dataset, feeder.local_name ), notice: 'Alimentador criado com sucesso.'
+    else
+      redirect_to new_feeder_path, alert: 'Não foi possível criar alimentador.'
+    end
   end
 
   #============================================================================
@@ -43,18 +46,11 @@ class DatasetsController < ApplicationController
   #============================================================================
   def update_feeder
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    dataset.update_individual( params[:individual] )
-    redirect_to show_feeder_path( dataset, params[:individual][:name] )
-  end
-
-  #============================================================================
-  # AJAX PUT /add_property
-  # * Places a specific property field to create/update individual form.
-  #============================================================================
-  def add_property
-    @type, @property = params[:type], params[:property]
-    if @type == 'resource'
-      @individuals = Dataset::find_by_id(params[:dataset_id]).individuals
+    if dataset.update_individual( params[:individual] )
+      redirect_to show_feeder_path( dataset, params[:individual][:name] ),
+                  notice: 'Alimentador modificado com sucesso.'
+    else
+      redirect_to edit_feeder_path, alert: 'Não foi possível modificar alimentador.'
     end
   end
 
@@ -76,7 +72,7 @@ class DatasetsController < ApplicationController
   def destroy_feeder
     dataset = Dataset::find_by_id( params[:id] )
     dataset.destroy_individual( params[:name] )
-    redirect_to dataset
+    redirect_to dataset, notice: 'Alimentador removido com sucesso.'
   end
 
   #============================================================================
@@ -97,7 +93,13 @@ class DatasetsController < ApplicationController
   def create_building_system
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     building_system = dataset.create_individual( params[:individual] )
-    redirect_to show_building_system_path( dataset, building_system.local_name )
+    if building_system
+      redirect_to show_building_system_path( dataset, building_system.local_name ),
+                  notice: 'Sistema predial criado com sucesso.'
+    else
+      redirect_to new_building_system_path,
+                  alert: 'Não foi possível criar sistema predial.'
+    end
   end
 
   #============================================================================
@@ -118,8 +120,13 @@ class DatasetsController < ApplicationController
   #============================================================================
   def update_building_system
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    dataset.update_individual( params[:individual] )
-    redirect_to show_building_system_path( dataset, params[:individual][:name] )
+    if dataset.update_individual( params[:individual] )
+      redirect_to show_building_system_path( dataset, params[:individual][:name] ),
+                  notice: 'Sistema predial modificado com sucesso.'
+    else
+      redirect_to edit_building_system_path,
+                  alert: 'Não foi possível modificar sistema predial.'
+    end
   end
 
   #============================================================================
@@ -139,8 +146,19 @@ class DatasetsController < ApplicationController
   #============================================================================
   def destroy_building_system
     dataset = Dataset::find_by_id( params[:id] )
-    dataset.destroy_individual( params[:name] )
-    redirect_to dataset
+    if dataset.destroy_individual( params[:name] )
+      redirect_to dataset, notice: 'Sistema predial removido com sucesso.'
+    end
+  end
+
+  def new_resource
+    dataset = Dataset::find_by_id( params[:id] )
+    @ontclasses = dataset.classes
+    @properties = dataset.properties
+    @individuals = dataset.individuals
+  end
+
+  def create_resource
   end
 
   #============================================================================
@@ -151,7 +169,7 @@ class DatasetsController < ApplicationController
   #============================================================================
   def reasoner_inferences
     if not params[:id] or not params[:name]
-      redirect_to( reasoner_path, notice: 'Nenhuma ontologia foi selecionado(a).' )
+      redirect_to( reasoner_path, alert: 'Nenhuma ontologia foi selecionada.' )
     end
     dataset = Dataset::find_by_id( params[:id] )
     @dataset_name = dataset.name
@@ -169,7 +187,7 @@ class DatasetsController < ApplicationController
   #============================================================================
   def query_results
     if params[:id].empty?
-      redirect_to( query_path, notice: 'Nenhuma ontologia selecionada.' )
+      redirect_to( query_path, alert: 'Nenhuma ontologia selecionada.' )
       return
     end
 
@@ -186,6 +204,17 @@ class DatasetsController < ApplicationController
     dataset = Dataset::find_by_id( params[:id] )
     path = "datasets/#{dataset.name}/#{dataset.rdf_source}"
     send_file( path, type: 'application/owl+xml', x_sendfile: true )
+  end
+
+  #============================================================================
+  # AJAX PUT /add_property
+  # * Places a specific property field to create/update individual form.
+  #============================================================================
+  def add_property
+    @type, @property = params[:type], params[:property]
+    if @type == 'resource'
+      @individuals = Dataset::find_by_id(params[:dataset_id]).individuals
+    end
   end
 
   # GET /datasets
@@ -215,7 +244,7 @@ class DatasetsController < ApplicationController
     @dataset = Dataset.new(dataset_params)
     respond_to do |format|
       if @dataset.save
-        format.html { redirect_to @dataset, notice: 'Dataset was successfully created.' }
+        format.html { redirect_to @dataset, notice: 'Dataset criado com sucesso.' }
         format.json { render :show, status: :created, location: @dataset }
       else
         format.html { render :new }
@@ -229,7 +258,7 @@ class DatasetsController < ApplicationController
   def update
     respond_to do |format|
       if @dataset.update(dataset_params)
-        format.html { redirect_to @dataset, notice: 'Dataset was successfully updated.' }
+        format.html { redirect_to @dataset, notice: 'Dataset modificado com sucesso.' }
         format.json { render :show, status: :ok, location: @dataset }
       else
         format.html { render :edit }
@@ -243,7 +272,7 @@ class DatasetsController < ApplicationController
   def destroy
     @dataset.destroy
     respond_to do |format|
-      format.html { redirect_to datasets_url, notice: 'Dataset was successfully destroyed.' }
+      format.html { redirect_to datasets_url, notice: 'Dataset removido com sucesso.' }
       format.json { head :no_content }
     end
   end
@@ -257,15 +286,5 @@ class DatasetsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def dataset_params
     params.require(:dataset).permit(:name, :user_id, rdf_source: [])
-  end
-
-  def check_cancel
-    return unless params[:commit] == 'Cancelar'
-
-    if params[:action] =~ /update/
-      redirect_to( dataset_path( params[:id] ) )
-    else
-      redirect_to( datasets_path )
-    end
   end
 end

@@ -20,6 +20,12 @@ class ApplicationController < ActionController::Base
   def require_authentication
     return if User::count.zero?
     return if cookies[:auth_token]
-    redirect_to( login_path )
+
+    if request.url == root_url or request.url == login_url
+      redirect_to login_path
+    else
+      redirect_to login_path( redirect: request.url ),
+                  alert: 'Favor efetuar login.'
+    end
   end
 end

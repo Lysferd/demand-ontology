@@ -16,10 +16,6 @@
           = yield( :subtitle )
       #logo= image_tag( 'logo.png' )
 
-    - if flash[:notice]
-      #notice
-        %p= flash[:notice]
-
     #spinner( hidden = true )
       %p
         = image_tag( 'spinner.gif' )
@@ -27,22 +23,21 @@
         Carregando...
 
     #contents
-      - if current_user
-        %nav
-          %ul
-            %li= link_to( 'Datasets', datasets_path )
-            /%li= link_to( 'OntoGraf', ontograf_path )
-            /%li= link_to( 'Reasoner', reasoner_path )
-            /%li= link_to( 'Executar Query', query_path )
-            %li= link_to( 'Usuários', users_path )
-            %li= link_to( 'Sair', logout_path, method: :delete )
+      = render 'layouts/navigation' if current_user
+
+      - if flash[:notice]
+        #notice= flash[:notice]
+
+      - if flash[:alert]
+        #alert= flash[:alert]
+
       = yield
 
     #footer
       #copyright
         Sistema de Ontologias de Demanda
         %sub
-          v1.6
+          v1.7
       #back-button
         = button_get 'Voltar', (@back ? @back : :back)
       #links

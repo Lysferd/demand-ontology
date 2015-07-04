@@ -2,6 +2,7 @@
 
 #form
   = form_tag :login do
+    = hidden_field_tag :redirect, params[:redirect]
     %table
       %tr
         %td= label_tag :email, 'E-mail:'

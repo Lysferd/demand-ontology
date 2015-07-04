@@ -368,6 +368,7 @@ class Dataset < ActiveRecord::Base
       end if args[:property]
 
       tdb.commit
+      true
     end
   end
 
@@ -387,9 +388,7 @@ class Dataset < ActiveRecord::Base
 
   #============================================================================
   def find_individual_by_name( name )
-    model.list_individuals.each do | i |
-      return i if i.local_name == name
-    end
+    model.get_individual( irify( name ) )
   end
 
   #============================================================================
@@ -397,6 +396,27 @@ class Dataset < ActiveRecord::Base
     model.list_individuals.map do |i|
       i.has_ont_class?( irify( ontclass ) ) ? i : nil
     end.compact
+  end
+
+  #============================================================================
+  def find_individuals_by_feeder( feeder )
+    if feeder.kind_of?( String )
+      feeder = model.get_individual( irify( feeder ) )
+    end
+
+    property = model.get_object_property( irify( 'has_Alimentador' ) )
+    model.list_individuals.select do |i|
+      i.has_property?( property ) and i.get_property_value( property ) == feeder
+    end
+  end
+
+  #============================================================================
+  def find_individuals_by_building_system( building_system_name )
+    building_system = model.get_individual( irify( building_system_name ) )
+    property = model.get_object_property( irify( 'has_Sistema_Predial' ) )
+    model.list_individuals.select do |i|
+      i.has_property?( property ) and i.get_property_value( property ) == building_system
+    end
   end
 
   #============================================================================
@@ -409,6 +429,11 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def feeders
     find_individuals_by_class( 'Alimentadores' )
+  end
+
+  #============================================================================
+  def building_systems
+    find_individuals_by_class( 'Sistema_Predial' )
   end
 
   #============================================================================
@@ -425,11 +450,6 @@ class Dataset < ActiveRecord::Base
       sum += get_demand( feeder ).get_int
     end
     sum
-  end
-
-  #============================================================================
-  def building_systems
-    find_individuals_by_class( 'Sistema_Predial' )
   end
 
   #============================================================================

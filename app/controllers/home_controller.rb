@@ -16,9 +16,9 @@ class HomeController < ApplicationController
       else
         cookies[:auth_token] = user.auth_token
       end
-      redirect_to( datasets_path )
+      redirect_to( params[:redirect] ? params[:redirect] : datasets_path )
     else
-      redirect_to( login_path )
+      redirect_to( login_path, alert: 'Não foi possível efetuar login: credenciais incorretas.' )
     end
   end
 

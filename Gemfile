@@ -41,7 +41,15 @@ gem 'bcrypt'#, '~> 3.1.7'
 # gem 'capistrano-rails', group: :development
 
 # Use Jena-JRuby from Github Fork.
-gem 'jena-jruby', github: 'Lysferd/jena-jruby'
+case RbConfig::CONFIG['host_os']
+when 'linux'
+  gem 'jena-jruby', github: 'Lysferd/jena-jruby'
+when 'mswin32'
+  gem 'jena-jruby', path: 'vendor/gems'
+else
+  fail
+end
+
 
 group :development, :test do
   gem 'pry'

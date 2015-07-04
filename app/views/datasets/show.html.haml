@@ -85,7 +85,7 @@
       - for building_system in building_systems do
         %tr
           %td= building_system.local_name
-          %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name )
+          %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name ) rescue "ERROR"
     %tr
       %td( colspan = 2 )
         = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )
