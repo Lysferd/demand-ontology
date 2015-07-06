@@ -9,7 +9,7 @@ class DatasetsController < ApplicationController
   #============================================================================
   def new_feeder
     dataset = Dataset::find_by_id( params[:id] )
-    @ontclass = dataset.find_class( 'Alimentadores' )
+    @ontclass = dataset.find_class( 'Alimentador' )
     @properties = dataset.properties
     @individuals = dataset.individuals
   end

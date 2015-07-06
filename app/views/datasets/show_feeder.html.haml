@@ -65,4 +65,4 @@
         - for individual in building_systems do
           %tr
             %td= individual.local_name
-            %td= @dataset.get_demand( individual ).get_int.to_s + 'W'
+            %td= @dataset.get_demand( individual ).get_int.to_s + 'W' rescue 'Não informado.'

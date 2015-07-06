@@ -35,7 +35,7 @@ class Dataset < ActiveRecord::Base
 
       {
           description: 'Soma de todas as potências de todos os Alimentadores:',
-          query: 'SELECT (SUM(?value) AS ?summedval) WHERE { ?object ?property ?value . ?object a demand:Alimentadores . ?object demand:Potencia_total ?value . }'
+          query: 'SELECT (SUM(?value) AS ?summedval) WHERE { ?object ?property ?value . ?object a demand:Alimentador . ?object demand:Potencia_total ?value . }'
       }
   ]
 
@@ -404,7 +404,7 @@ class Dataset < ActiveRecord::Base
       feeder = model.get_individual( irify( feeder ) )
     end
 
-    property = model.get_object_property( irify( 'has_Alimentador' ) )
+    property = model.get_object_property( irify( 'Pertence_Alimentador' ) )
     model.list_individuals.select do |i|
       i.has_property?( property ) and i.get_property_value( property ) == feeder
     end
@@ -413,7 +413,7 @@ class Dataset < ActiveRecord::Base
   #============================================================================
   def find_individuals_by_building_system( building_system_name )
     building_system = model.get_individual( irify( building_system_name ) )
-    property = model.get_object_property( irify( 'has_Sistema_Predial' ) )
+    property = model.get_object_property( irify( 'Pertence_Sistema_Predial' ) )
     model.list_individuals.select do |i|
       i.has_property?( property ) and i.get_property_value( property ) == building_system
     end
@@ -428,7 +428,7 @@ class Dataset < ActiveRecord::Base
 
   #============================================================================
   def feeders
-    find_individuals_by_class( 'Alimentadores' )
+    find_individuals_by_class( 'Alimentador' )
   end
 
   #============================================================================
@@ -438,7 +438,7 @@ class Dataset < ActiveRecord::Base
 
   #============================================================================
   def get_demand( individual )
-    property = model.get_property( irify( 'Potencia_total' ) )
+    property = model.get_property( irify( 'Potência_Total' ) )
     individual.get_property( property )
   end
 

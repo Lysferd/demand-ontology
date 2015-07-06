@@ -67,48 +67,27 @@
         = button_get 'Novo Alimentador', new_feeder_path( @dataset )
         = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name ) rescue nil
 
-%table( style = "display: inline-block;" )
-  %caption
-    Lista de Sistemas Prediais
-  %thead
-    %th
-      Nome
-    %th
-      Opções
-  %tbody
-    - building_systems = @dataset.building_systems
-    - if building_systems.empty?
-      %tr
-        %td( colspan = 2)
-          Nenhum sistema predial está presente na ontologia!
-    - else
-      - for building_system in building_systems do
+- unless @dataset.feeders.empty?
+  %table( style = "display: inline-block;" )
+    %caption
+      Lista de Sistemas Prediais
+    %thead
+      %th
+        Nome
+      %th
+        Opções
+    %tbody
+      - building_systems = @dataset.building_systems
+      - if building_systems.empty?
         %tr
-          %td= building_system.local_name
-          %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name ) rescue "ERROR"
-    %tr
-      %td( colspan = 2 )
-        = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )
-        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Sistema_Predial' ).local_name ) rescue nil
-
-/
-  %table
-  %caption
-    Lista de Indivíduos
-  %thead
-    %th
-      Nome do Indivíduo
-    %th
-      Classe do Indivíduo
-    %th
-      Opções
-
-  %tbody
-    -# for individual in @dataset.individuals do
+          %td( colspan = 2)
+            Nenhum sistema predial está presente na ontologia!
+      - else
+        - for building_system in building_systems do
+          %tr
+            %td= building_system.local_name
+            %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name ) rescue "ERROR"
       %tr
-        %td=# individual.local_name.gsub( /_/, ' ' )
-        %td=# ont_class( individual )
-        %td
-          =# button_get 'Detalhes', show_individual_path( @dataset, individual.local_name )
-          =# button_get 'Editar', edit_individual_path( @dataset, individual.local_name )
-          =# button_delete 'Excluir', destroy_individual_path( @dataset, individual.local_name )
+        %td( colspan = 2 )
+          = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )
+          = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Sistema_Predial' ).local_name ) rescue nil
