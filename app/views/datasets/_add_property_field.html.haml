@@ -6,3 +6,4 @@
         individuals, { prompt: 'Selecione um indivíduo' }
     - else
       = text_field_tag "individual[property][#{type}:#{property}]"
+    = image_tag 'destroy.svg', class: 'remove_property'

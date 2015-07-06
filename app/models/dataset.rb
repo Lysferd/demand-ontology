@@ -348,7 +348,12 @@ class Dataset < ActiveRecord::Base
       for key, value in args[:property] do
         property = model.get_property(namespace + key.split(':')[1])
 
-        resource = case key
+        if key =~ /destroy/
+          resource = individual.get_property_value( property )
+          individual.remove_property( property, resource )
+
+        else
+          resource = case key
                      when /int/ then
                        ResourceFactory::create_typed_literal(value.to_i)
                      when /float/ then
@@ -357,13 +362,13 @@ class Dataset < ActiveRecord::Base
                        ResourceFactory::create_typed_literal(value.to_s)
                      else
                        model.get_individual(namespace + value)
-                   end
+                     end
 
-        if individual.has_property?(property) and
-            not individual.get_property_value( property ) == resource
-          individual.set_property_value(property, resource)
-        else
-          individual.add_property(property, resource)
+          if individual.has_property?(property) and not individual.get_property_value( property ) == resource
+            individual.set_property_value(property, resource)
+          else
+            individual.add_property(property, resource)
+          end
         end
       end if args[:property]
 

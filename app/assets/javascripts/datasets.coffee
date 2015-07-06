@@ -4,15 +4,28 @@
 
 $ ->
   $( 'td.template' ).click ->
-    console.log $(@).text()
-    console.log $( 'textarea#query' ).val()
-    $( 'textarea#query' ).val $(@).text()
+    $( 'textarea#query' ).val( $(@).text() )
 
   $( 'select#property' ).change ->
     values = $('select#property :selected').val().split ':'
-    $('a[data-property]').data 'type', values[0]
-    $('a[data-property]').data 'property', values[1]
-    console.log values
+    property = $('a[data-property]')
+    property.data 'type', values[0]
+    property.data 'property', values[1]
+
+  $( 'img.destroy_property' ).click ->
+    mode = $(@).data( 'mode' )
+    original_property = $(@).data( 'original-property' )
+    property = $(@).data( 'property' )
+    parent_tr = $(@).parent().parent()
+    if not mode
+      $( '#individual_property_' + original_property.replace(":", "\\:") ).attr( 'name', "individual[property][#{property}]" )
+      $(@).data( 'original-color', parent_tr.css( 'background-color' ) )
+      parent_tr.animate { backgroundColor: '#FF3333' }, { easing: "linear", duration: 500 }
+    else
+      $( '#individual_property_' + original_property.replace(":", "\\:") ).attr( 'name', "individual[property][#{original_property}]" )
+      parent_tr.animate { backgroundColor: $(@).data( 'original-color' ) }, { easing: "linear", duration: 500 }
+
+    $(@).data( 'mode', !mode )
 
   $( 'a[data-property]' ).click ->
     dataset_id = $(@).data 'dataset-id'
