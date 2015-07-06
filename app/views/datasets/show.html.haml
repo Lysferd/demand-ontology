@@ -31,7 +31,8 @@
 
 %p
   = button_get 'Query', query_path( @dataset )
-  /= button_get 'Inferências', reasoner_path( @dataset )
+  = button_get 'Inferências', reasoner_path( @dataset, name: 'self' )
+  = button_get 'OntoGraf',ontograf_path( @dataset )
 
 %hr
 

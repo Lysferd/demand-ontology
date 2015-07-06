@@ -416,8 +416,11 @@ class Dataset < ActiveRecord::Base
   end
 
   #============================================================================
-  def find_individuals_by_building_system( building_system_name )
-    building_system = model.get_individual( irify( building_system_name ) )
+  def find_individuals_by_building_system( building_system )
+    if building_system.kind_of?( String )
+      building_system = model.get_individual( irify( building_system ) )
+    end
+
     property = model.get_object_property( irify( 'Pertence_Sistema_Predial' ) )
     model.list_individuals.select do |i|
       i.has_property?( property ) and i.get_property_value( property ) == building_system
@@ -558,4 +561,3 @@ class Dataset < ActiveRecord::Base
     return( [$!.message] )
   end
 end
-

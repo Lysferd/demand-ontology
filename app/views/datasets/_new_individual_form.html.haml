@@ -12,13 +12,21 @@
         %td= text_field_tag 'individual[name]'
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
-        %td= text_field_tag 'individual[class]', ont_class, readonly: true
-      /
-        select_tag 'individual[class]',
-        select_helper( @classes, { prompt: 'Selecione uma classe' } )
+        - if not defined? ont_classes
+          %td= text_field_tag 'individual[class]', ont_class, readonly: true
+        - else
+          %td= select_tag 'individual[class]', select_helper( ont_classes, { prompt: 'Selecione uma classe' } )
+      - if defined? ont_classes
+        %tr
+          %td= label_tag 'individual[property][resource:Pertence_Sistema_Predial]', 'Pertence Sistema Predial:'
+          %td
+            = select_tag "individual[property][resource:Pertence_Sistema_Predial]",
+              select_helper(individuals), { prompt: 'Selecione um indivíduo' } rescue $!.message
+
       %tr
         %td= select_tag 'property',
           select_properties( properties ), { prompt: 'Selecione uma propriedade' }
-        %td= link_to 'Adicionar Propriedade', '#', data: { dataset_id: id, type: nil, property: nil }
+        %td= link_to 'Adicionar Propriedade', '#', id: 'add_property',
+          data: { dataset_id: id, type: nil, property: nil }
   %p
     = submit_tag 'Aplicar'

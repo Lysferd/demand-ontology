@@ -52,19 +52,25 @@
     %th
       Nome
     %th
-      Potência Total
+      Potencia
+    %th
+      Opçoes
   %tbody
-    - resources = [ ] #@dataset.find_individuals_by_feeder( @individual )
+    - resources = @dataset.find_individuals_by_building_system( @individual ).to_a
     - if resources.empty?
       %tr
-        %td( colspan = 2 )
+        %td( colspan = 3 )
           #no_resources
             Não há recursos interligados a este sistema predial!
     - else
       - for individual in resources do
         %tr
           %td= individual.local_name
-          %td= @dataset.get_demand( individual ).get_int.to_s + 'W'
+          %td= @dataset.get_demand( individual ).get_int.to_s + 'W' rescue 'Nao informado.'
+          %td
+            = button_get 'Editar', edit_resource_path( @dataset, individual.local_name )
+            = button_delete 'Excluir', destroy_resource_path( @dataset, individual.local_name )
+
     %tr
-      %td( colspan = 2 )
-        #new_resource_link= link_to 'Adicionar Recurso', new_resource_path
+      %td( colspan = 3 )
+        = button_get 'Adicionar Recurso', new_resource_path( @dataset )

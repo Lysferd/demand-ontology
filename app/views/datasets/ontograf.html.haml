@@ -1,0 +1,32 @@
+= content_for( :subtitle ) do
+  OntoGraf
+
+%iframe( src = "http://owlgred.lumii.lv/online_visualization/1sij" )
+
+/#stage
+/
+  :coffeescript
+  draw = ->
+    list = # {@ontclasses}
+    spacing = 20
+
+    for ontclass, i in list
+      width = 10 * ontclass.length
+      height = 20
+      x = spacing + stage.width / list.length * i
+      y = spacing + height
+
+      new Rect(x, y, width, height, 5).stroke("black", 2).addTo(stage)
+      new Text(ontclass).addTo(stage).attr({
+        fontFamily: 'Courier New, monospaced',
+        fontSize: '15',
+        textFillColor: 'white',
+        x: x + 3,
+        y: y + height / 2 + 5
+      })
+
+  bonsai.run( $('#stage')[0],
+    code: draw,
+    width: $(window).width() - 20,
+    height: 800
+  )

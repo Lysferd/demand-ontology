@@ -9,8 +9,6 @@ Rails.application.routes.draw do
   # Define HTTP GET/POST Routes:
   controller :home do
     get 'index' => :index
-    get 'ontograf' => :ontograf
-
     get 'login' => :login
     post 'login' => :create_session
     delete 'logout' => :destroy_session
@@ -37,9 +35,11 @@ Rails.application.routes.draw do
 
     # -=-=-=-=-
     # Define routes for Resources (AJAX)
-    get 'new_resource'        => :new_resource
-    post 'create_resource'    => :create_resource
-    delete 'destroy_resource' => :destroy_resource
+    get 'new_resource/:id'              => :new_resource, as: :new_resource
+    get 'edit_resource/:id/:name'       => :edit_resource, as: :edit_resource
+    post 'create_resource'              => :create_resource
+    post 'update_resource'              => :update_resource
+    delete 'destroy_resource/:id/:name' => :destroy_resource, as: :destroy_resource
 
     # -=-=-=-=-
     # Define routes for querying:
@@ -48,14 +48,16 @@ Rails.application.routes.draw do
 
     # -=-=-=-=-
     # Define routes for reasoning:
-    #get 'reasoner/:id' => :reasoner, as: :reasoner
     get 'reasoner/:id/:name' => :reasoner_inferences, as: :reasoner
+
+    # -=-=-=-=-
+    # Define routes for graphical ontology:
+    get 'ontograf/:id' => :ontograf, as: :ontograf
   end
 
   # -=-=-=-=-
   # Define AJAX Requests:
   get 'datasets/:id/send_rdf_source', to: 'datasets#send_rdf_source', as: :send_rdf_source
-
   put 'add_property', to: 'datasets#add_property'
 
   # -=-=-=-=-

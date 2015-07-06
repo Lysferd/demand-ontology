@@ -72,7 +72,11 @@ class DatasetsController < ApplicationController
   def destroy_feeder
     dataset = Dataset::find_by_id( params[:id] )
     dataset.destroy_individual( params[:name] )
-    redirect_to dataset, notice: 'Alimentador removido com sucesso.'
+    
+    respond_to do |format|
+      format.html { redirect_to dataset, notice: 'Alimentador removido com sucesso.' }
+      format.json { head :no_content }
+    end
   end
 
   #============================================================================
@@ -146,19 +150,60 @@ class DatasetsController < ApplicationController
   #============================================================================
   def destroy_building_system
     dataset = Dataset::find_by_id( params[:id] )
-    if dataset.destroy_individual( params[:name] )
-      redirect_to dataset, notice: 'Sistema predial removido com sucesso.'
+    dataset.destroy_individual( params[:name] )
+
+    respond_to do |format|
+      format.html { redirect_to dataset, notice: 'Sistema predial removido com sucesso.' }
+      format.json { head :no_content }
     end
   end
 
   def new_resource
     dataset = Dataset::find_by_id( params[:id] )
-    @ontclasses = dataset.classes
+    @ont_classes = dataset.classes
     @properties = dataset.properties
     @individuals = dataset.individuals
   end
 
+  def edit_resource
+    @dataset = Dataset::find_by_id(params[:id] )
+    @individual = @dataset.find_individual_by_name(params[:name])
+    @ont_class = @individual.list_ont_classes(true).map do |c|
+      !(c.local_name =~ /NamedIndividual/) ? c : nil
+    end.compact[0]
+  end
+
   def create_resource
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
+    resource = dataset.create_individual( params[:individual] )
+    if resource
+      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_Sistema_Predial'] ),
+                  notice: 'Recurso criado com sucesso.'
+    else
+      redirect_to new_building_system_path,
+                  alert: 'Não foi possível criar recurso.'
+    end
+  end
+
+  def update_resource
+    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
+    if dataset.update_individual( params[:individual] )
+      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_Sistema_Predial'] ),
+                  notice: 'Recurso modificado com sucesso.'
+    else
+      redirect_to edit_building_system_path,
+                  alert: 'Não foi possível modificar recurso.'
+    end
+  end
+
+  def destroy_resource
+    dataset = Dataset::find_by_id( params[:id] )
+    dataset.destroy_individual( params[:name] )
+
+    respond_to do |format|
+      format.html { redirect_to dataset, notice: 'Recurso removido com sucesso.' }
+      format.json { head :no_content }
+    end
   end
 
   #============================================================================
@@ -215,6 +260,24 @@ class DatasetsController < ApplicationController
     if @type == 'resource'
       @individuals = Dataset::find_by_id(params[:dataset_id]).individuals
     end
+  end
+
+  def ontograf
+    dataset = Dataset::find_by_id( params[:id] )
+
+    @ontclasses = [ ]
+    dataset.model.list_hierarchy_root_classes.each do |c|
+      @ontclasses << test(@ontclasses, c)
+    end
+  end
+
+  def test(arr, c)
+    arr << c.local_name
+    c.list_sub_classes.each do |sub|
+      #arr << sub.local_name
+      test(arr, sub)
+    end
+    nil
   end
 
   # GET /datasets

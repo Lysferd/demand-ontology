@@ -1,0 +1,4 @@
+= content_for( :subtitle ) do
+  = "Editando #{@individual.local_name}"
+
+= render 'edit_individual_form', route: :update_resource, individual: @individual, ont_class: @ont_class, individuals: @dataset.individuals, properties: @dataset.properties

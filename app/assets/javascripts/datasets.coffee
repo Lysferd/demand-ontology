@@ -12,7 +12,7 @@ $ ->
     property.data 'type', values[0]
     property.data 'property', values[1]
 
-  $( 'img.destroy_property' ).click ->
+  $( 'a.destroy_property' ).click ->
     mode = $(@).data( 'mode' )
     original_property = $(@).data( 'original-property' )
     property = $(@).data( 'property' )
@@ -20,14 +20,16 @@ $ ->
     if not mode
       $( '#individual_property_' + original_property.replace(":", "\\:") ).attr( 'name', "individual[property][#{property}]" )
       $(@).data( 'original-color', parent_tr.css( 'background-color' ) )
+      parent_tr.attr( 'title', 'Propriedade será removida.' )
       parent_tr.animate { backgroundColor: '#FF3333' }, { easing: "linear", duration: 500 }
     else
       $( '#individual_property_' + original_property.replace(":", "\\:") ).attr( 'name', "individual[property][#{original_property}]" )
+      parent_tr.attr( 'title', '' )
       parent_tr.animate { backgroundColor: $(@).data( 'original-color' ) }, { easing: "linear", duration: 500 }
 
     $(@).data( 'mode', !mode )
 
-  $( 'a[data-property]' ).click ->
+  $( 'a#add_property' ).click ->
     dataset_id = $(@).data 'dataset-id'
     type = $(@).data 'type'
     property = $(@).data 'property'

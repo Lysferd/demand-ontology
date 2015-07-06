@@ -48,7 +48,7 @@
                   - type = nil
                   - value = property.object
                 = text_field_tag "individual[property][#{type}:#{name}]", value
-              = image_tag 'destroy.svg', class: 'destroy_property', title: 'Remover propriedade.',
+              = link_to image_tag('destroy.svg'), '#', class: 'destroy_property', title: 'Remover propriedade.',
                 data: { property: "destroy:#{name}",
                         original_property: "#{type}:#{name}",
                         mode: false }
@@ -57,6 +57,7 @@
         %td
           - options = select_properties( properties )
           = select_tag 'property', options, { prompt: 'Selecione uma propriedade' }
-        %td= link_to 'Adicionar Propriedade', '#', data: { dataset_id: params[:id], type: nil, property: nil }
+        %td= link_to 'Adicionar Propriedade', '#', id: 'add_property',
+          data: { dataset_id: params[:id], type: nil, property: nil }
   %p
     = submit_tag 'Aplicar'
