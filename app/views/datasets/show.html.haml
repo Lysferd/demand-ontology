@@ -25,7 +25,6 @@
       %td= "#{@dataset.count} / #{@dataset.count_rdf}"
       %td= @dataset.individuals.to_a.size
       %td
-        =# button_get 'Adicionar Indivíduo', new_individual_path( @dataset )
         = button_get 'Editar', edit_dataset_path( @dataset )
         = button_delete 'Excluir', @dataset
 
@@ -56,12 +55,12 @@
       - for feeder in feeders do
         %tr
           %td= feeder.local_name
-          %td= @dataset.get_demand( feeder ) ? @dataset.get_demand( feeder ).get_int.to_s + ' W' : 'Não informado.'
+          %td= @dataset.building_systems_demand( feeder ).to_s + 'W' rescue $!
           %td= button_get 'Detalhes', show_feeder_path( @dataset, feeder.local_name )
     %tr
       %td( colspan = 3 )
         Potencia Total:
-        = @dataset.demand_sum
+        = @dataset.total_demand
         W
     %tr
       %td( colspan = 3 )
@@ -87,7 +86,7 @@
         - for building_system in building_systems do
           %tr
             %td= building_system.local_name
-            %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name ) rescue "ERROR"
+            %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name )
       %tr
         %td( colspan = 2 )
           = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )

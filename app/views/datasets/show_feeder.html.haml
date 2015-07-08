@@ -10,6 +10,8 @@
     %th
       Classes do Alimentador
     %th
+      Potencia Total
+    %th
       Opções
 
   %tbody
@@ -19,6 +21,7 @@
         - @individual.list_ont_classes(true).to_a.each do |c|
           = c.local_name rescue $!.message
           %br/
+      %td= @dataset.building_systems_demand( @individual ).to_s + 'W' rescue $!
       %td
         = button_get 'Inferências', reasoner_path( @dataset, @individual.local_name )
         = button_get 'Editar', edit_feeder_path( @dataset, @individual.local_name )
@@ -65,4 +68,4 @@
         - for individual in building_systems do
           %tr
             %td= individual.local_name
-            %td= @dataset.get_demand( individual ).get_int.to_s + 'W' rescue 'Não informado.'
+            %td= @dataset.resources_demand( individual ).to_s + 'W' rescue $!

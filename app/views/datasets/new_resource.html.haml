@@ -1,4 +1,9 @@
 = content_for( :subtitle ) do
   Criando Recurso
 
-= render 'new_individual_form', route: :create_resource, id: params[:id], ont_classes: @ont_classes, properties: @properties, individuals: @individuals
+= render 'new_individual_form',
+  route: :create_resource,
+  id: params[:id],
+  ont_classes: @ont_classes,
+  properties: @properties,
+  individuals: @individuals

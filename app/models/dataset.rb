@@ -446,16 +446,33 @@ class Dataset < ActiveRecord::Base
 
   #============================================================================
   def get_demand( individual )
-    property = model.get_property( irify( 'Potência_Total' ) )
-    individual.get_property( property )
+    property = model.get_property( irify( 'Potência_Ativa' ) )
+    individual.get_property( property ).get_int rescue 0
   end
 
   #============================================================================
-  def demand_sum
+  def resources_demand( building_system )
+    sum = 0
+    for resource in find_individuals_by_building_system( building_system ) do
+      sum += get_demand( resource )
+    end
+    sum
+  end
+
+  #============================================================================
+  def building_systems_demand( feeder )
+    sum = 0
+    for building_system in find_individuals_by_feeder( feeder ) do
+      sum += resources_demand( building_system )
+    end
+    sum
+  end
+
+  #============================================================================
+  def total_demand
     sum = 0
     for feeder in feeders do
-      next unless get_demand( feeder )
-      sum += get_demand( feeder ).get_int
+      sum += building_systems_demand( feeder )
     end
     sum
   end

@@ -72,7 +72,7 @@ class DatasetsController < ApplicationController
   def destroy_feeder
     dataset = Dataset::find_by_id( params[:id] )
     dataset.destroy_individual( params[:name] )
-    
+
     respond_to do |format|
       format.html { redirect_to dataset, notice: 'Alimentador removido com sucesso.' }
       format.json { head :no_content }
@@ -87,7 +87,7 @@ class DatasetsController < ApplicationController
     dataset = Dataset::find_by_id( params[:id] )
     @ontclass = dataset.find_class( 'Sistema_Predial' )
     @properties = dataset.properties
-    @individuals = dataset.individuals
+    @individuals = dataset.feeders
   end
 
   #============================================================================
@@ -158,11 +158,15 @@ class DatasetsController < ApplicationController
     end
   end
 
+  #============================================================================
+  # GET /new_resource
+  # * Form for resource creation.
+  #============================================================================
   def new_resource
     dataset = Dataset::find_by_id( params[:id] )
     @ont_classes = dataset.classes
     @properties = dataset.properties
-    @individuals = dataset.individuals
+    @individuals = dataset.building_systems
   end
 
   def edit_resource

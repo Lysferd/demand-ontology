@@ -1,4 +1,8 @@
 = content_for( :subtitle ) do
   Criando Alimentador
 
-= render 'new_individual_form', route: :create_feeder, id: params[:id], ont_class: @ontclass.local_name, properties: @properties
+= render 'new_individual_form',
+  route: :create_feeder,
+  id: params[:id],
+  ont_class: @ontclass.local_name,
+  properties: @properties

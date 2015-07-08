@@ -12,16 +12,22 @@
         %td= text_field_tag 'individual[name]'
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
-        - if not defined? ont_classes
+        - if not route =~ /resource/
           %td= text_field_tag 'individual[class]', ont_class, readonly: true
         - else
           %td= select_tag 'individual[class]', select_helper( ont_classes, { prompt: 'Selecione uma classe' } )
-      - if defined? ont_classes
+
+      - if route =~ /resource/
         %tr
           %td= label_tag 'individual[property][resource:Pertence_Sistema_Predial]', 'Pertence Sistema Predial:'
-          %td
-            = select_tag "individual[property][resource:Pertence_Sistema_Predial]",
-              select_helper(individuals), { prompt: 'Selecione um indivíduo' } rescue $!.message
+          %td= select_tag "individual[property][resource:Pertence_Sistema_Predial]",
+            select_helper( individuals ), { prompt: 'Selecione um indivíduo' } rescue $!.message
+
+      - if route =~ /building_system/
+        %tr
+          %td= label_tag 'individual[property][resource:Pertence_Alimentador]', 'Pertence Alimentador:'
+          %td= select_tag "individual[property][resource:Pertence_Alimentador]",
+            select_helper( individuals ), { prompt: 'Selecione um indivíduo' } rescue $!.message
 
       %tr
         %td= select_tag 'property',
