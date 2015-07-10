@@ -479,7 +479,7 @@ class Dataset < ActiveRecord::Base
   # @param [Symbol] property
   #-------------------------------------------------------------------------
   def summation individuals, property
-    return individuals.map( &property ).inject( &:+ ).round 3
+    return individuals.map( &property ).inject( &:+ ).round 3 rescue 0
   end
 
   #-------------------------------------------------------------------------
