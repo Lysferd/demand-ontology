@@ -8,8 +8,8 @@ class DatasetsController < ApplicationController
   # * Creates a form page for the creation of Feeders.
   #============================================================================
   def new_feeder
-    dataset = Dataset::find_by_id( params[:id] )
-    @ontclass = dataset.find_class( 'Alimentador' )
+    dataset = Dataset::find_by_id params[:id]
+    @ont_class = dataset.ontology_class 'Alimentador'
     @properties = dataset.properties
     @individuals = dataset.individuals
   end
@@ -33,11 +33,8 @@ class DatasetsController < ApplicationController
   # * Creates a form page for updating an individual's properties.
   #============================================================================
   def edit_feeder
-    @dataset = Dataset::find_by_id(params[:id] )
-    @individual = @dataset.find_individual_by_name(params[:name])
-    @ont_class = @individual.list_ont_classes(true).map do |c|
-      !(c.local_name =~ /NamedIndividual/) ? c : nil
-    end.compact[0]
+    @dataset = Dataset::find_by_id params[:id]
+    @individual = @dataset.individual params[:name]
   end
 
   #============================================================================
@@ -59,10 +56,10 @@ class DatasetsController < ApplicationController
   # * Shows property details of an individual.
   #============================================================================
   def show_feeder
-    @dataset = Dataset::find_by_id( params[:id] )
-    @individual = @dataset.find_individual_by_name( params[:name] )
+    @dataset = Dataset::find_by_id params[:id]
+    @individual = @dataset.individual params[:name]
 
-    @back = dataset_path( @dataset )
+    @back = dataset_path @dataset
   end
 
   #============================================================================
@@ -84,8 +81,8 @@ class DatasetsController < ApplicationController
   # * Creates a form page for the creation of Feeders.
   #============================================================================
   def new_building_system
-    dataset = Dataset::find_by_id( params[:id] )
-    @ontclass = dataset.find_class( 'Sistema_Predial' )
+    dataset = Dataset::find_by_id params[:id]
+    @ontclass = dataset.ontology_class 'Sistema_Predial'
     @properties = dataset.properties
     @individuals = dataset.feeders
   end
@@ -111,11 +108,8 @@ class DatasetsController < ApplicationController
   # * Creates a form page for updating an individual's properties.
   #============================================================================
   def edit_building_system
-    @dataset = Dataset::find_by_id(params[:id] )
-    @individual = @dataset.find_individual_by_name(params[:name])
-    @ont_class = @individual.list_ont_classes(true).map do |c|
-      !(c.local_name =~ /NamedIndividual/) ? c : nil
-    end.compact[0]
+    @dataset = Dataset::find_by_id params[:id]
+    @individual = @dataset.individual params[:name]
   end
 
   #============================================================================
@@ -138,10 +132,11 @@ class DatasetsController < ApplicationController
   # * Shows property details of an individual.
   #============================================================================
   def show_building_system
-    @dataset = Dataset::find_by_id( params[:id] )
-    @individual = @dataset.find_individual_by_name( params[:name] )
+    @dataset = Dataset::find_by_id params[:id]
+    @individual = @dataset.individual params[:name]
+    #@resources = @dataset.individuals parent: @individual
 
-    @back = dataset_path( @dataset )
+    @back = dataset_path @dataset
   end
 
   #============================================================================
@@ -170,18 +165,15 @@ class DatasetsController < ApplicationController
   end
 
   def edit_resource
-    @dataset = Dataset::find_by_id(params[:id] )
-    @individual = @dataset.find_individual_by_name(params[:name])
-    @ont_class = @individual.list_ont_classes(true).map do |c|
-      !(c.local_name =~ /NamedIndividual/) ? c : nil
-    end.compact[0]
+    @dataset = Dataset::find_by_id params[:id]
+    @individual = @dataset.individual params[:name]
   end
 
   def create_resource
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     resource = dataset.create_individual( params[:individual] )
     if resource
-      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_Sistema_Predial'] ),
+      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_A'] ),
                   notice: 'Recurso criado com sucesso.'
     else
       redirect_to new_building_system_path,
@@ -192,7 +184,7 @@ class DatasetsController < ApplicationController
   def update_resource
     dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
     if dataset.update_individual( params[:individual] )
-      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_Sistema_Predial'] ),
+      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_A'] ),
                   notice: 'Recurso modificado com sucesso.'
     else
       redirect_to edit_building_system_path,
@@ -211,8 +203,18 @@ class DatasetsController < ApplicationController
   end
 
   #============================================================================
+  def statistics
+    dataset = Dataset::find_by_id( params[:id] )
+
+    @data = dataset.feeders.map do |i|
+      { 'Demanda Total' => i.summation(:demand), 'RDF Total' => i.summation(:rdp) }
+    end
+
+  end
+
+  #============================================================================
   def reasoner
-    @dataset = Dataset::find_by_id( params[:id] )
+    @dataset = Dataset::find_by_id params[:id]
   end
 
   #============================================================================

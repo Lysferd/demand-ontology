@@ -14,25 +14,20 @@
         %td= label_tag 'individual[class]', 'Classe:'
         - if not route =~ /resource/
           %td= text_field_tag 'individual[class]', ont_class, readonly: true
+
         - else
           %td= select_tag 'individual[class]', select_helper( ont_classes, { prompt: 'Selecione uma classe' } )
 
-      - if route =~ /resource/
+      - if route =~ /resource|building_system/
         %tr
-          %td= label_tag 'individual[property][resource:Pertence_Sistema_Predial]', 'Pertence Sistema Predial:'
-          %td= select_tag "individual[property][resource:Pertence_Sistema_Predial]",
-            select_helper( individuals ), { prompt: 'Selecione um indivíduo' } rescue $!.message
-
-      - if route =~ /building_system/
-        %tr
-          %td= label_tag 'individual[property][resource:Pertence_Alimentador]', 'Pertence Alimentador:'
-          %td= select_tag "individual[property][resource:Pertence_Alimentador]",
-            select_helper( individuals ), { prompt: 'Selecione um indivíduo' } rescue $!.message
+          %td= label_tag 'individual[property][resource:Pertence_A]', 'Pertence_A:'
+          %td= select_tag 'individual[property][resource:Pertence_A]',
+            select_helper( individuals ), { prompt: 'Selecione um indivíduo' }
 
       %tr
         %td= select_tag 'property',
           select_properties( properties ), { prompt: 'Selecione uma propriedade' }
         %td= link_to 'Adicionar Propriedade', '#', id: 'add_property',
           data: { dataset_id: id, type: nil, property: nil }
-  %p
-    = submit_tag 'Aplicar'
+
+  %p= submit_tag 'Aplicar'

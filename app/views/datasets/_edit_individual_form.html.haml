@@ -12,32 +12,28 @@
     %tbody
       %tr
         %td= label_tag 'individual[name]', 'Nome:'
-        %td= text_field_tag 'individual[name]', individual.local_name
+        %td= text_field_tag 'individual[name]', individual.name
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
-        - if ont_class
-          %td= text_field_tag 'individual[class]', ont_class.local_name, readonly: true
-        - else
-          %td= select_tag 'individual[class]',
-            select_helper( classes, selected: ont_class.local_name )
+        - if true
+          %td= text_field_tag 'individual[class]', individual.ontological_class.local_name, readonly: true
 
-        - @individual.list_properties.each do | property |
+        - else
+          %td= select_tag 'individual[class]', select_helper( classes, selected: ont_class.local_name )
+
+        - individual.properties.each do | property |
           - name = property.get_predicate.local_name
-          - next if name == 'type'
           %tr
-            %td= label_tag "individual[property][#{name}]", name.gsub( ?_, ?\s ).titleize + ?:
+            %td= label_tag "individual[property][#{name}]", name + ?:, id: "label_#{name}"
             %td
               - if property.object.resource?
                 - options = select_helper individuals, selected: property.resource.local_name
-                - type = 'resource'
-                = select_tag "individual[property][#{type}:#{name}]", options
+                = select_tag "individual[property][resource:#{name}]", options, id: "input_#{name}"
+
               - else
                 - if property.object.to_s =~ /int/i
                   - type = 'int'
                   - value = property.int
-                - elsif property.object.to_s =~ /float/i
-                  - type = 'float'
-                  - value = property.float
                 - elsif property.object.to_s =~ /double/i
                   - type = 'double'
                   - value = property.double
@@ -47,11 +43,11 @@
                 - else
                   - type = nil
                   - value = property.object
-                = text_field_tag "individual[property][#{type}:#{name}]", value
-              = link_to image_tag('destroy.svg'), '#', class: 'destroy_property', title: 'Remover propriedade.',
-                data: { property: "destroy:#{name}",
-                        original_property: "#{type}:#{name}",
-                        mode: false }
+                = text_field_tag "individual[property][#{type}:#{name}]", value, id: "input_#{name}"
+              = link_to image_tag('destroy.svg'), '#',
+                id: "destroy_#{name}",
+                title: 'Remover propriedade.',
+                data: { property: "destroy:#{name}", original_property: "#{type}:#{name}", mode: false }
 
       %tr
         %td

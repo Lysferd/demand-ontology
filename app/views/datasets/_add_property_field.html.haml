@@ -1,9 +1,8 @@
 %tr
-  %td= label_tag "individual[property][#{type}:#{property}]", property.gsub(/_/,' ').titleize + ':'
+  %td= label_tag "individual[property][#{type}:#{property}]", property + ?:, id: "label_#{property}"
   %td
     - if type =~ /resource/i
-      = select_tag "individual[property][#{type}:#{property}]",
-        individuals, { prompt: 'Selecione um indivíduo' }
+      = select_tag "individual[property][#{type}:#{property}]", individuals, { prompt: 'Selecione um indivíduo' }
     - else
-      = text_field_tag "individual[property][#{type}:#{property}]"
+      = text_field_tag "individual[property][#{type}:#{property}]", '', id: "input_#{property}"
     = image_tag 'destroy.svg', class: 'remove_property'

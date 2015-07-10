@@ -53,6 +53,8 @@ Rails.application.routes.draw do
     # -=-=-=-=-
     # Define routes for graphical ontology:
     get 'ontograf/:id' => :ontograf, as: :ontograf
+
+    get 'statistics/:id' => :statistics, as: :statistics
   end
 
   # -=-=-=-=-

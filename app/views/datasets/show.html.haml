@@ -32,6 +32,7 @@
   = button_get 'Query', query_path( @dataset )
   = button_get 'Inferências', reasoner_path( @dataset, name: 'self' )
   = button_get 'OntoGraf',ontograf_path( @dataset )
+  = button_get 'Estatísticas', statistics_path( @dataset )
 
 %hr
 
@@ -42,7 +43,7 @@
     %th
       Nome
     %th
-      Potencia
+      Demanda
     %th
       Opções
   %tbody
@@ -54,18 +55,20 @@
     - else
       - for feeder in feeders do
         %tr
-          %td= feeder.local_name
-          %td= @dataset.building_systems_demand( feeder ).to_s + 'W' rescue $!
-          %td= button_get 'Detalhes', show_feeder_path( @dataset, feeder.local_name )
+          %td= feeder.name
+          %td
+            = feeder.summation :demand
+            VA
+          %td= button_get 'Detalhes', show_feeder_path( @dataset, feeder.name )
     %tr
       %td( colspan = 3 )
-        Potencia Total:
-        = @dataset.total_demand
-        W
+        Demanda Total:
+        = feeders.map { |i| i.summation :demand }.inject(:+)
+        VA
     %tr
       %td( colspan = 3 )
         = button_get 'Novo Alimentador', new_feeder_path( @dataset )
-        = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Alimentadores' ).local_name ) rescue nil
+        = button_get 'Inferências de Classe', reasoner_path( @dataset, 'Alimentador' ) rescue nil
 
 - unless @dataset.feeders.empty?
   %table( style = "display: inline-block;" )
@@ -75,19 +78,24 @@
       %th
         Nome
       %th
+        Demanda
+      %th
         Opções
     %tbody
       - building_systems = @dataset.building_systems
       - if building_systems.empty?
         %tr
-          %td( colspan = 2)
+          %td( colspan = 3)
             Nenhum sistema predial está presente na ontologia!
       - else
         - for building_system in building_systems do
           %tr
-            %td= building_system.local_name
-            %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.local_name )
+            %td= building_system.name
+            %td
+              = building_system.summation :demand rescue 0
+              VA
+            %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.name )
       %tr
-        %td( colspan = 2 )
+        %td( colspan = 3 )
           = button_get 'Novo Sistema Predial', new_building_system_path( @dataset )
           = button_get 'Inferências de Classe', reasoner_path( @dataset, @dataset.find_class( 'Sistema_Predial' ).local_name ) rescue nil

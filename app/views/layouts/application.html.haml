@@ -5,6 +5,8 @@
       Ontologias de Demanda
     = stylesheet_link_tag 'application', media: :all, 'data-turbolinks-track' => true
     = javascript_include_tag 'application', 'data-turbolinks-track' => true
+    = javascript_include_tag "//www.google.com/jsapi", "chartkick"
+    /= javascript_include_tag "path/to/highcharts.js", "chartkick"
     = csrf_meta_tags
 
   %body

@@ -1,5 +1,5 @@
 = content_for( :subtitle ) do
-  = "Detalhes de #{@individual.local_name}"
+  = "Detalhes de #{@individual.name}"
 
 %table
   %caption
@@ -10,22 +10,38 @@
     %th
       Classes do Alimentador
     %th
-      Potencia Total
+      Informações Derivadas
     %th
       Opções
 
   %tbody
     %tr
-      %td= @individual.local_name
+      %td= @individual.name
+      %td= @individual.ontological_class.local_name
       %td
-        - @individual.list_ont_classes(true).to_a.each do |c|
-          = c.local_name rescue $!.message
-          %br/
-      %td= @dataset.building_systems_demand( @individual ).to_s + 'W' rescue $!
+        Potência Ativa:
+        %strong
+          = @individual.summation :active_power
+          W
+        %br/
+        Potência Reativa:
+        %strong
+          = @individual.summation :reactive_power
+          VAR
+        %br/
+        Demanda:
+        %strong
+          = @individual.summation :demand
+          VA
+        %br/
+        RDP:
+        %strong
+          = @individual.summation :rdp
+          VA
       %td
-        = button_get 'Inferências', reasoner_path( @dataset, @individual.local_name )
-        = button_get 'Editar', edit_feeder_path( @dataset, @individual.local_name )
-        = button_delete 'Excluir', destroy_feeder_path( @dataset, @individual.local_name )
+        = button_get 'Inferências', reasoner_path( @dataset, @individual.name )
+        = button_get 'Editar', edit_feeder_path( @dataset, @individual.name )
+        = button_delete 'Excluir', destroy_feeder_path( @dataset, @individual.name )
 
 %p
   %table
@@ -37,14 +53,12 @@
       %th
         Valor da Propriedade
     %tbody
-      - properties = @individual.list_properties.to_a
-      - if properties.empty?
+      - if @individual.properties.empty?
         %tr
-          %td
+          %td( colspan = 2 )
             Alimentador não possui nenhuma propriedade!
       - else
-        - properties.each do | property |
-          - next if property.predicate.to_s =~ /type/
+        - for property in @individual.properties do
           %tr
             %td= property.predicate.local_name
             %td= property.object.resource ? property.resource.local_name : property.string
@@ -57,15 +71,16 @@
       %th
         Nome
       %th
-        Potência Total
+        Demanda Total
     %tbody
-      - building_systems = @dataset.find_individuals_by_feeder( @individual )
-      - if building_systems.empty?
+      - if @individual.has_children?
         %tr
           %td( colspan = 2 )
             Não há sistemas prediais interligados a este alimentador!
       - else
-        - for individual in building_systems do
+        - for individual in @individual.children do
           %tr
-            %td= individual.local_name
-            %td= @dataset.resources_demand( individual ).to_s + 'W' rescue $!
+            %td= individual.name
+            %td
+              = individual.summation :demand
+              VA

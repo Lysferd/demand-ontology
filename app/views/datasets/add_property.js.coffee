@@ -1,3 +1,4 @@
+
 $('form table tr:last').before(
   <% if @individuals %>
   '<%=j render 'add_property_field', type: @type, property: @property,

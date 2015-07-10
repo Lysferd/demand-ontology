@@ -4,8 +4,9 @@ class Dataset < ActiveRecord::Base
 
   #-=-=-=-=-=-=-
   # Jena-JRuby Library
-  require( 'jena_jruby' )
-  require( 'fileutils' )
+  require 'jena_jruby'
+  require 'fileutils'
+  require 'individual'
 
   #-=-=-=-=-=-=-
   # Module Mixins
@@ -34,8 +35,8 @@ class Dataset < ActiveRecord::Base
       },
 
       {
-          description: 'Soma de todas as potências de todos os Alimentadores:',
-          query: 'SELECT (SUM(?value) AS ?summedval) WHERE { ?object ?property ?value . ?object a demand:Alimentador . ?object demand:Potencia_total ?value . }'
+          description: 'Soma das potências de todos os Alimentadores:',
+          query: 'SELECT (SUM(?value) AS ?summedval) WHERE { ?object ?property ?value . ?object a demand:Alimentador . ?object demand:Potência_Aparente ?value . }'
       }
   ]
 
@@ -54,48 +55,40 @@ class Dataset < ActiveRecord::Base
   # Table References
   belongs_to :user
 
-  #-=-=-=-=-=-=-
-  #define_attribute_method :name
-  #define_attribute_method :rdf_source
-
   private
-  #============================================================================
-  # *
-  #============================================================================
+  #-------------------------------------------------------------------------
+  # * Dataset TDB Files Creation
+  #  This method creates the directory tree, RDF/OWL model and TDB files.
+  #-------------------------------------------------------------------------
   def create_dataset
-    # -=-=-=-=-
-    # Fixes possible issues with IRIs.
-    self.name.gsub!( ?\s, ?_ )
+    fix_name( self.name )
 
     # -=-=-=-=-
-    # Create Datasets folder.
-    path = DATASET_FOLDER
-    Dir::mkdir( path ) unless FileTest::exist?( path )
+    # Make directories as needed.
+    path = File::join( DATASET_FOLDER, self.name )
+    FileUtils::mkdir_p path unless FileTest::exist? path
 
-    # -=-=-=-=-
-    # Create folder for this dataset.
-    path += "/#{self.name}"
-    Dir::mkdir( path ) unless FileTest::exist?( path )
-
-    # -=-=-=-=-
-    # Save uploaded RDF source file.
-    model_filename = self.rdf_source[0].original_filename.gsub( ?\s, ?_ )
-    path += "/#{model_filename}"
-    upload_model( path, self.rdf_source[0] )
+    model_filename = fix_name( self.rdf_source[0].original_filename )
+    upload_model( File::join(path, model_filename), self.rdf_source[0] )
     self.rdf_source = model_filename
 
     # -=-=-=-=-
     # Populate Dataset with the Ontology Model.
     datawrite do
-      tdb.get_default_model.add( rdf_model )
+      tdb.get_default_model.add rdf_model
       tdb.commit
     end
 
   end
 
+  #-------------------------------------------------------------------------
+  # * Dataset TDB Files Update
+  #  This method updates the Dataset data, and merges any additional models
+  # uploaded from the view.
+  #-------------------------------------------------------------------------
   def update_dataset
     if self.name_changed?
-      self.name.gsub!( ?\s, ?_ )
+      fix_name( self.name )
       old_path = File::join( DATASET_FOLDER, self.changed_attributes[:name] )
       new_path = File::join( DATASET_FOLDER, self.name )
       FileUtils::mv( old_path, new_path )
@@ -128,101 +121,140 @@ class Dataset < ActiveRecord::Base
 
       # Populate Dataset with the Ontology Model.
       datawrite do
-        tdb.get_default_model.add( rdf_model )
+        tdb.get_default_model.add rdf_model
         tdb.commit
       end
     end
   end
 
-  def upload_model( path, data )
-    File::open( path, 'wb' ) { | rdf | rdf.write( data.read ) }
+  #-------------------------------------------------------------------------
+  def upload_model path, data
+    File::open( path, 'wb' ) { |rdf| rdf.write data.read }
   end
 
-  public
-  #============================================================================
+  #-------------------------------------------------------------------------
+  def dataset_path
+    return File::join DATASET_FOLDER, self.name, self.rdf_source
+  end
+
+  #-------------------------------------------------------------------------
+  def tdb_path
+    return File::join DATASET_FOLDER, self.name, 'tdb'
+  end
+
+  #-------------------------------------------------------------------------
+  # * IRI Name Fix
+  #  Replaces all space characters ' ' for underscore characters '_' in
+  # order to avoid inconsistent IRIs.
+  #
+  # @param [String] name_string
+  #-------------------------------------------------------------------------
+  def fix_name( name_string )
+    return name_string.gsub ?\s, ?_
+  end
+
+  #-------------------------------------------------------------------------
+  # * IRI Value Generation
+  #  Helper method that generates a valid IRI value.
+  # Inside ontologies, individuals, classes and properties cannot have name
+  # values with space characters ' ', for they are displayed in the URI, and
+  # URIs cannot have spaces. Instead, spaces should be replaced by underscore
+  # characters '_'.
+  #-------------------------------------------------------------------------
+  def irify( name )
+    name = fix_name name
+    return name if name =~ /#{namespace}/
+    return namespace + name
+  end
+
+  #-------------------------------------------------------------------------
   # * Get Ontology Namespace
   #  This method returns the ontology's namespace from the RDF/OWL source,
   # since as of version 2.12.0 of Jena, there is a bug that impedes the
   # dataset model from storing prefix values.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def namespace
-    rdf_model.get_ns_prefix_map['']
+    return rdf_model.ns_prefix_map['']
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Get OWL Prefix
-  #============================================================================
+  #-------------------------------------------------------------------------
   def owl_prefix
-    rdf_model.get_ns_prefix_map['owl']
+    return rdf_model.ns_prefix_map['owl']
   end
 
-  #============================================================================
-  # * Get/Create RDF/OWL Source Model
-  #============================================================================
+  #-------------------------------------------------------------------------
+  def query_prefixes
+    model.ns_prefix_map.map { |key, value| "PREFIX #{key.empty? ? ':' : key}: <#{value}>" }.join ?\n
+  end
+
+  #-------------------------------------------------------------------------
+  # * Create RDF/OWL Source Model
+  #-------------------------------------------------------------------------
+  def load_rdf_model
+    rdf_model = ModelFactory::create_ontology_model OntModelSpec::OWL_MEM
+    Util::FileManager::get.read_model rdf_model, dataset_path
+
+    return rdf_model
+  end
+
+  #-------------------------------------------------------------------------
+  # * Get RDF/OWL Source Model
+  #-------------------------------------------------------------------------
   def rdf_model
-    unless @rdf_model
-      @rdf_model = ModelFactory::create_ontology_model( OntModelSpec::OWL_MEM )
-      Util::FileManager::get.read_model( @rdf_model, File::join( DATASET_FOLDER, self.name, self.rdf_source ) )
-      #@rdf_model.set_strict_mode( false )
-    end
-    @rdf_model
+    return @rdf_model ||= load_rdf_model
   end
 
-  #============================================================================
-  # * Get/Create Dataset Model
+  #-------------------------------------------------------------------------
+  # * Create Dataset Model
   #  This method loads and returns the model inside the TDB.
-  # Note that #get_default_model returns an instance of `ModelCom' class,
+  # Note that #default_model returns an instance of `ModelCom' class,
   # which does not provide the ever-so-helpful methods like #list_individuals
   # nor #list_classes. In order to be able to use these methods without SPARQL
   # queries, it is necessary that a new `OntModel' object to be created, based
   # on the default model within the dataset.
   #
-  #  This method has been enhaced to check if the TDB is already in a
+  #  This method has been enhanced to check if the TDB is already in a
   # transaction, and if true, does not tries to overlap it with yet another
   # transaction. This fixes the following error:
   # 'Java::ComHpHplJenaTdb::TDBException: Read-only block manager`
-  #============================================================================
+  #-------------------------------------------------------------------------
+  def load_tdb_model
+    base_model = tdb.in_transaction ? tdb.default_model : dataread { tdb.default_model }
+    model = ModelFactory::create_ontology_model OntModelSpec::OWL_MEM, base_model
+    model.set_strict_mode false
+
+    return model
+  end
+
+  #-------------------------------------------------------------------------
+  # * Get Dataset Model
+  #-------------------------------------------------------------------------
   def model
-    unless @model
-      spec = OntModelSpec::OWL_MEM
-      if tdb.in_transaction?
-        base_model = tdb.get_default_model
-      else
-        base_model = dataread { tdb.get_default_model }
-      end
-      @model = ModelFactory::create_ontology_model( spec, base_model )
-      @model.set_strict_mode( false )
-    end
-    @model
+    return @model ||= load_tdb_model
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Get/Create TDB
-  #============================================================================
+  #-------------------------------------------------------------------------
   def tdb
-    unless @tdb
-      path = File::join( DATASET_FOLDER, self.name, 'tdb' )
-      @tdb = TDBFactory::create_dataset( path )
-    end
-    @tdb
+    return( @tdb ||= TDBFactory::create_dataset tdb_path )
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Destroy TDB
-  # FIXME just destroying the files on disk does not destroys it from memory.
-  # FIXME this method does not permanently remove the files, which accumulate
-  #       in the system's recycle bin and waste resources.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def destroy_tdb
     FileUtils::rm_r( File::join( DATASET_FOLDER, self.name ) )
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Start TDB Transaction
   #  A helper method to ease the use of TDB transactions.
   #
   # Arguments:
-  #  kind (Symbol) - :read, :r, :write, or :w
+  #  kind (Symbol) - :read, :write
   #
   # Note that if the TDB is already undergoing a transaction, the Jena API will
   # raise a Java::ComHpHplJenaSparql::JenaTransactionException exception, which
@@ -231,15 +263,15 @@ class Dataset < ActiveRecord::Base
   #
   # Also note that write transactions shall not automatically commit changes,
   # so that the developer can decide to commit or rollback changes in runtime.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def transaction( kind )
     case kind
-    when :r, :read
-      tdb.begin( ReadWrite::READ )
-    when :w, :write
-      tdb.begin( ReadWrite::WRITE )
+    when :read
+      tdb.begin ReadWrite::READ
+    when :write
+      tdb.begin ReadWrite::WRITE
     else
-      fail( ArgumentError, 'Expected valid transaction type: read or write.' )
+      fail ArgumentError, 'Expected valid transaction type: read or write.'
     end
 
     yield
@@ -247,45 +279,33 @@ class Dataset < ActiveRecord::Base
     tdb.end if tdb.in_transaction?
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Start TDB Read Transaction
   #  Helper method that simply passes the given block to the real transaction
   # method.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def dataread
-    self.transaction( :read, &Proc::new )
+    transaction :read, &Proc::new
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Start TDB Write Transaction
   #  Helper method that simply passes the given block to the real transaction
   # method.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def datawrite
-    self.transaction( :write, &Proc::new )
-  end
-
-  #============================================================================
-  # * IRI Value Generation
-  #  Helper method that generates a valid IRI value.
-  # Inside ontologies, individuals, classes and properties cannot have name
-  # values with space characters ' ', for they are displayed in the URI, and
-  # URIs cannot have spaces. Instead, spaces should be replaced by underscore
-  # characters '_'.
-  #============================================================================
-  def irify( local_name )
-    namespace + local_name.gsub( ?\s, ?_ )
+    transaction :write, &Proc::new
   end
 
   public
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Dataset Individual Creation
-  #============================================================================
-  def create_individual( args )
+  #-------------------------------------------------------------------------
+  def create_individual args
     datawrite do
 
       # -=-=-=-=-
-      ont_class_iri = irify( args[:class] )
+      ont_class_iri = irify args[:class]
       ont_class = model.get_ont_class( ont_class_iri )
 
       unless ont_class
@@ -294,7 +314,7 @@ class Dataset < ActiveRecord::Base
       end
 
       # -=-=-=-=-
-      individual_iri = irify( args[:name] )
+      individual_iri = irify args[:name]
       individual = model.create_individual( individual_iri, ont_class )
 
       # -=-=-=-=-
@@ -311,14 +331,10 @@ class Dataset < ActiveRecord::Base
           resource = model.get_individual( resource_iri )
         else
           resource = case key
-                       when /int/ then
-                         model.create_typed_literal( value.to_i )
-                       when /float/ then
-                         model.create_typed_literal( value.to_f )
-                       when /literal/ then
-                         model.create_typed_literal( value.to_s )
-                       else
-                         model.create_literal( value )
+                       when /int/     then model.create_typed_literal( value.to_i )
+                       when /double/  then model.create_typed_literal( value.to_f )
+                       when /literal/ then model.create_typed_literal( value.to_s )
+                       else model.create_literal( value )
                      end
         end
 
@@ -331,8 +347,8 @@ class Dataset < ActiveRecord::Base
     end
   end
 
-  #============================================================================
-  def update_individual( args )
+  #-------------------------------------------------------------------------
+  def update_individual args
     datawrite do
       individual = model.get_individual( irify( args[:original_name] ) )
 
@@ -354,14 +370,10 @@ class Dataset < ActiveRecord::Base
 
         else
           resource = case key
-                     when /int/ then
-                       ResourceFactory::create_typed_literal(value.to_i)
-                     when /float/ then
-                       ResourceFactory::create_typed_literal(value.to_f)
-                     when /literal/ then
-                       ResourceFactory::create_typed_literal(value.to_s)
-                     else
-                       model.get_individual(namespace + value)
+                     when /int/     then ResourceFactory::create_typed_literal( value.to_i )
+                     when /double/  then ResourceFactory::create_typed_literal( value.to_f )
+                     when /literal/ then ResourceFactory::create_typed_literal( value.to_s )
+                     else model.get_individual( irify( value ) )
                      end
 
           if individual.has_property?(property) and not individual.get_property_value( property ) == resource
@@ -373,14 +385,15 @@ class Dataset < ActiveRecord::Base
       end if args[:property]
 
       tdb.commit
-      true
+
+      return true
     end
   end
 
-  #============================================================================
-  def destroy_individual( name )
+  #-------------------------------------------------------------------------
+  def destroy_individual name
     datawrite do
-      individual = model.get_individual( namespace + name )
+      individual = model.get_individual irify name
       if not individual
         tdb.abort
         fail ArgumentError, 'Given individual does not exist.'
@@ -391,190 +404,172 @@ class Dataset < ActiveRecord::Base
     end
   end
 
-  #============================================================================
-  def find_individual_by_name( name )
-    model.get_individual( irify( name ) )
+  #-------------------------------------------------------------------------
+  # * Individual Abstraction Method
+  #  This method abstracts a single individual from the ontology, given a valid
+  # individual name (local_name, full URI, or Individual).
+  #
+  # @param [String] object
+  #-------------------------------------------------------------------------
+  def individual object
+    return AbstractIndividual::new object.kind_of?(Individual) ? object : model.get_individual(irify(object))
   end
 
-  #============================================================================
-  def find_individuals_by_class( ontclass )
-    model.list_individuals.map do |i|
-      i.has_ont_class?( irify( ontclass ) ) ? i : nil
-    end.compact
+  #-------------------------------------------------------------------------
+  def ontology_class name
+    return model.get_ont_class irify name
   end
 
-  #============================================================================
-  def find_individuals_by_feeder( feeder )
-    if feeder.kind_of?( String )
-      feeder = model.get_individual( irify( feeder ) )
-    end
+  #-------------------------------------------------------------------------
+  # * Abstraction of Multiple Individuals Method
+  #  This method collects and returns abstraction individuals out of all
+  # individuals that match a given filter.
+  #
+  # @param [Hash] filter
+  #-------------------------------------------------------------------------
+  def individuals filter = Hash[]
+    return case
 
-    property = model.get_object_property( irify( 'Pertence_Alimentador' ) )
-    model.list_individuals.select do |i|
-      i.has_property?( property ) and i.get_property_value( property ) == feeder
-    end
+    # -=-=-=-=-=-
+    # Select individuals that match a certain ontological class.
+    when filter[:class]
+      ontological_class = filter[:class].kind_of?(String) ? ontology_class( filter[:class] ) : filter[:class]
+      model.list_individuals.select { |i| i.has_ont_class? ontological_class }
+
+    # -=-=-=-=-=-
+    # Select individuals that match a certain parent.
+    when filter[:parent]
+      parent = filter[:parent].kind_of?(String) ? individual(filter[:parent]) : filter[:parent]
+      property = model.get_object_property irify 'Pertence_A'
+
+      model.list_individuals.select do |i|
+        i.has_property? property and i.get_property_value( property ) == parent
+      end
+
+    # -=-=-=-=-=-
+    # Select all individuals.
+    else
+      model.list_individuals
+
+    end.map { |i| logger.debug i; individual i }
   end
 
-  #============================================================================
-  def find_individuals_by_building_system( building_system )
-    if building_system.kind_of?( String )
-      building_system = model.get_individual( irify( building_system ) )
-    end
-
-    property = model.get_object_property( irify( 'Pertence_Sistema_Predial' ) )
-    model.list_individuals.select do |i|
-      i.has_property?( property ) and i.get_property_value( property ) == building_system
-    end
-  end
-
-  #============================================================================
-  # * Dataset Individual Array
-  #============================================================================
-  def individuals
-    model.list_individuals.to_a
-  end
-
-  #============================================================================
+  #-------------------------------------------------------------------------
+  # * Get All Feeders
+  #  Helper method to easily get all individuals with class `Alimentador'.
+  #-------------------------------------------------------------------------
   def feeders
-    find_individuals_by_class( 'Alimentador' )
+    return individuals class: 'Alimentador'
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
+  # * Get All Building Systems
+  #  Helper method to easily get all individuals with class
+  # `Sistema_Predial'.
+  #-------------------------------------------------------------------------
   def building_systems
-    find_individuals_by_class( 'Sistema_Predial' )
+    return individuals class: 'Sistema_Predial'
   end
 
-  #============================================================================
-  def get_demand( individual )
-    property = model.get_property( irify( 'Potência_Ativa' ) )
-    individual.get_property( property ).get_int rescue 0
+  #-------------------------------------------------------------------------
+  # * Individual Property Summation
+  #  Sums `property' of all individuals in the Array.
+  #
+  # @param [Array] individuals
+  # @param [Symbol] property
+  #-------------------------------------------------------------------------
+  def summation individuals, property
+    return individuals.map( &property ).inject( &:+ ).round 3
   end
 
-  #============================================================================
-  def resources_demand( building_system )
-    sum = 0
-    for resource in find_individuals_by_building_system( building_system ) do
-      sum += get_demand( resource )
-    end
-    sum
-  end
-
-  #============================================================================
-  def building_systems_demand( feeder )
-    sum = 0
-    for building_system in find_individuals_by_feeder( feeder ) do
-      sum += resources_demand( building_system )
-    end
-    sum
-  end
-
-  #============================================================================
-  def total_demand
-    sum = 0
-    for feeder in feeders do
-      sum += building_systems_demand( feeder )
-    end
-    sum
-  end
-
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Dataset Triple Count
-  #============================================================================
+  #-------------------------------------------------------------------------
   def count
-    dataread { tdb.default_model.size }
-  end
-  
-  #============================================================================
-  # * Model Triple Count
-  #============================================================================
-  def count_rdf
-    rdf_model.size
+    return model.size
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
+  # * Model Triple Count
+  #-------------------------------------------------------------------------
+  def count_rdf
+    return rdf_model.size
+  end
+
+  #-------------------------------------------------------------------------
   # * Dataset Classes
   #  Returns an instance of `Array' containing all the classes from the model,
   # properly removing the trailing namespace.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def classes
     model.list_classes.to_a
   end
 
-  #============================================================================
-  def find_class( name )
-    model.list_classes.to_a.each do |c|
-      return c if c.local_name == name
-    end
-  end
-
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Dataset Properties
   #  Returns an instance of `Array' containing all the Object and Data(type)
   # properties from the model.
-  #============================================================================
+  #-------------------------------------------------------------------------
   def properties
     object_properties + datatype_properties
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Dataset Object Properties
-  #============================================================================
+  #-------------------------------------------------------------------------
   def object_properties
     model.list_object_properties.to_a
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Dataset Data(type) Properties
-  #============================================================================
+  #-------------------------------------------------------------------------
   def datatype_properties
     model.list_datatype_properties.to_a
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Reasoner Inferences
-  #============================================================================
-  def reason( resource_name )
+  #-------------------------------------------------------------------------
+  def reason resource_name
     schema = ModelFactory::create_default_model
-    schema.read( 'http://www.w3.org/2002/07/owl' )
+    schema.read owl_prefix
+
     reasoner = ReasonerRegistry::get_owl_reasoner
-    reasoner.bind_schema( schema )
+    reasoner.bind_schema schema
 
-    infmodel = ModelFactory::create_inf_model( reasoner, model )
-    resource = infmodel.get_resource( namespace + resource_name )
+    infmodel = ModelFactory::create_inf_model reasoner, model
+    resource = infmodel.get_resource irify resource_name
 
-    infmodel.list_statements( resource, nil, nil )
+    return infmodel.list_statements resource, nil, nil
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Dataset Query
-  #============================================================================
-  def query( string )
-    prefixes = ''
-
-    rdf_model.ns_prefix_map.each_pair do |k, v|
-      prefixes += "PREFIX #{k.empty? ? 'demand' : k}: <#{v}>\n"
-    end
-
-    q = QueryFactory::create( prefixes + string )
+  #-------------------------------------------------------------------------
+  def query string
     dataread do
-      yield(QueryExecutionFactory::create(q, tdb.default_model))
+      query = QueryFactory::create query_prefixes + string
+      yield QueryExecutionFactory::create query, model
     end
   end
 
-  #============================================================================
+  #-------------------------------------------------------------------------
   # * Array of Query Results
   #  This helper method populates an `Array' object with the results of the
   # query.
-  #============================================================================
-  def query_to_array( string )
+  #-------------------------------------------------------------------------
+  def query_to_array string
     results = [ ]
-    query( string ) do | query_exec |
-      query_exec.exec_select.each do | result |
+
+    query string do | execution |
+      execution.exec_select.each do | result |
         results << result
       end
     end
-    return( results )
+
+    return results
   rescue Java::ComHpHplJenaQuery::QueryParseException
-    return( [$!.message] )
+    return [ $!.message ]
   end
 end

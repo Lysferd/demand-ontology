@@ -1,0 +1,13 @@
+= content_for( :subtitle ) do
+  Estatísticas
+
+/= button_to 'Demanda Total', '#'
+/= button_to 'Posiçao Geografica', '#'
+
+= @data
+
+%hr/
+
+#div
+  - for data in @data do
+    = pie_chart data, title: 'name'

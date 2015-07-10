@@ -50,6 +50,7 @@ else
   fail
 end
 
+gem 'chartkick'
 
 group :development, :test do
   gem 'pry'
