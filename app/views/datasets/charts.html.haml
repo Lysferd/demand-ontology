@@ -1,10 +1,10 @@
-= content_for( :subtitle ) do
+- content_for( :subtitle ) do
   = "Curvas de Carga de #{@individual.name}"
 
 %h3
   Demanda:
-= area_chart @individual.timeline :demand
+= area_chart @individual.timeline(:demand, @individual.kind_of?('Alimentador') )
 %hr/
 %h3
-  RDP:
-= area_chart @individual.timeline :rdp
+  Resposta à Demanda Provável (RDP):
+= area_chart @individual.timeline( :rdp, @individual.kind_of?('Alimentador') )

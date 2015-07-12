@@ -1,4 +1,4 @@
-= content_for( :subtitle ) do
+- content_for( :subtitle ) do
   = "Detalhes de #{@individual.name}"
 
 %table
@@ -21,25 +21,26 @@
       %td
         Potência Ativa:
         %strong
-          = @individual.summation :active_power rescue 0
+          = @individual.summation :active_power
           W
         %br/
         Potência Reativa:
         %strong
-          = @individual.summation :reactive_power rescue 0
+          = @individual.summation :reactive_power
           VAR
         %br/
         Demanda:
         %strong
-          = @individual.summation :demand rescue 0
+          = @individual.summation :positive_demand
           VA
         %br/
         RDP:
         %strong
-          = @individual.summation :rdp rescue 0
+          = @individual.summation :rdp
           VA
       %td
         = button_get 'Inferências', reasoner_path( @dataset, @individual.name )
+        = button_get 'Estatísticas', statistics_path( @dataset, @individual.name )
         = button_get 'Curvas de Carga',charts_path( @dataset, @individual.name )
         = button_get 'Editar', edit_building_system_path( @dataset, @individual.name )
         = button_delete 'Excluir', destroy_building_system_path( @dataset, @individual.name )

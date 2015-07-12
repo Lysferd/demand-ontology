@@ -1,13 +1,12 @@
-= content_for( :subtitle ) do
+- content_for( :subtitle ) do
   Estatísticas
 
-/= button_to 'Demanda Total', '#'
-/= button_to 'Posiçao Geografica', '#'
-
-= @data
-
+%h3
+  Resposta à Demanda Provável (RDP):
+- data = { 'Demanda Total' => @individual.summation(:positive_demand), 'RDP Total' => @individual.summation(:rdp) }
+= pie_chart data
 %hr/
-
-#div
-  - for data in @data do
-    = pie_chart data, title: 'name'
+%h3
+  Recursos Energéticos Distribuídos (DER):
+- data = { 'Demanda Total' => @individual.summation(:positive_demand), 'DER Total' => @individual.summation(:der) }
+= pie_chart data

@@ -35,7 +35,7 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def kind_of? object
-    return @ontological_class == object
+    return @ontological_class.local_name == object
   end
   alias :instance_of? :kind_of?
   alias :is_a?        :kind_of?
@@ -48,7 +48,7 @@ class AbstractIndividual < Dataset
   #-------------------------------------------------------------------------
   def parent
     return nil unless has_parent?
-    return individual value :Pertence_A
+    return individual value 'Pertence_A'
   end
 
   #-------------------------------------------------------------------------
@@ -61,12 +61,12 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def has_parent?
-    return has_property? :Pertence_A
+    return has_property? 'Pertence_A'
   end
 
   #-------------------------------------------------------------------------
   def property property_name
-    return model.get_property irify property_name.to_s
+    return model.get_property irify property_name
   end
 
   #-------------------------------------------------------------------------
@@ -77,7 +77,7 @@ class AbstractIndividual < Dataset
   #-------------------------------------------------------------------------
   def has_property? *property_names
     for property in property_names do
-      return false unless @individual.has_property? model.get_property irify property.to_s
+      return false unless @individual.has_property? model.get_property irify property
     end
     return true
   end
@@ -90,32 +90,32 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def apparent_power
-    return 0 unless has_property? :Potência_Aparente
-    return value :Potência_Aparente
+    return 0 unless has_property? 'Potência_Aparente'
+    return value 'Potência_Aparente'
   end
 
   #-------------------------------------------------------------------------
   def demand_factor
-    return 1.0 unless has_property? :Fator_de_Demanda
-    return value :Fator_de_Demanda
+    return 1.0 unless has_property? 'Fator_de_Demanda'
+    return value 'Fator_de_Demanda'
   end
 
   #-------------------------------------------------------------------------
   def power_factor
-    return 1.0 unless has_property? :Fator_de_Potência
-    return value :Fator_de_Potência
+    return 1.0 unless has_property? 'Fator_de_Potência'
+    return value 'Fator_de_Potência'
   end
 
   #-------------------------------------------------------------------------
   def usage_priority
-    return nil unless has_property? :Prioridade_de_Uso
-    return value :Prioridade_de_Uso
+    return nil unless has_property? 'Prioridade_de_Uso'
+    return value 'Prioridade_de_Uso'
   end
 
   #-------------------------------------------------------------------------
   def generation_priority
-    return nil unless has_property? :Prioridade_de_Geração
-    return value :Prioridade_de_Geração
+    return nil unless has_property? 'Prioridade_de_Geração'
+    return value 'Prioridade_de_Geração'
   end
 
   #-------------------------------------------------------------------------
@@ -129,8 +129,14 @@ class AbstractIndividual < Dataset
   end
 
   #-------------------------------------------------------------------------
+  def positive_demand
+    return 0 if apparent_power < 0
+    return demand
+  end
+
+  #-------------------------------------------------------------------------
   def active_power
-    return apparent_power * power_factor
+    return apparent_power.abs * power_factor
   end
 
   #-------------------------------------------------------------------------
@@ -140,13 +146,20 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def rdp
-    return (demand.abs / priority).round 3
+    return 0 if usage_priority.nil?
+    return (demand.abs / usage_priority).round 3
+  end
+
+  #-------------------------------------------------------------------------
+  def der
+    return 0 if generation_priority.nil?
+    return ((apparent_power * demand_factor).abs / generation_priority).round 3
   end
 
   #-------------------------------------------------------------------------
   def start_time
-    return '00:00' unless has_property? :Início_de_Atividade
-    return value :Início_de_Atividade
+    return '00:00' unless has_property? 'Início_de_Atividade'
+    return value 'Início_de_Atividade'
   end
 
   #-------------------------------------------------------------------------
@@ -157,8 +170,8 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def duration_time
-    return '23:59' unless has_property? :Duração_de_Atividade
-    return value :Duração_de_Atividade
+    return '23:59' unless has_property? 'Duração_de_Atividade'
+    return value 'Duração_de_Atividade'
   end
 
   #-------------------------------------------------------------------------
@@ -183,7 +196,7 @@ class AbstractIndividual < Dataset
   end
 
   #-------------------------------------------------------------------------
-  def timeline property
+  def timeline property, merge = false
     if has_children?
       timelines = [ ]
 
@@ -191,7 +204,9 @@ class AbstractIndividual < Dataset
         timelines += child.timeline property
       end
 
-      return timelines
+      return timelines unless merge
+      return [ name: @name, data: timelines.inject { |m, o| m.merge(o[:data]) { |_, old, new| old + new } } ]
+
     else
       data = { }
 
@@ -217,5 +232,4 @@ class AbstractIndividual < Dataset
   def summation property
     super children.map { |e| [ e, e.children ] }.flatten, property
   end
-
 end

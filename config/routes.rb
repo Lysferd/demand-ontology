@@ -50,10 +50,8 @@ Rails.application.routes.draw do
     # Define routes for reasoning:
     get 'reasoner/:id/:name' => :reasoner_inferences, as: :reasoner
     get 'ontograf/:id' => :ontograf, as: :ontograf
-    get 'statistics/:id' => :statistics, as: :statistics
-
+    get 'statistics/:id/:name' => :statistics, as: :statistics
     get 'charts/:id/:name' => :charts, as: :charts
-    #get 'demand_charts'
   end
 
   # -=-=-=-=-

@@ -204,12 +204,8 @@ class DatasetsController < ApplicationController
 
   #============================================================================
   def statistics
-    dataset = Dataset::find_by_id( params[:id] )
-
-    @data = dataset.feeders.map do |i|
-      { 'Demanda Total' => i.summation(:demand), 'RDF Total' => i.summation(:rdp) }
-    end
-
+    dataset = Dataset::find_by_id params[:id]
+    @individual = dataset.individual params[:name]
   end
 
   #============================================================================

@@ -32,7 +32,6 @@
   = button_get 'Query', query_path( @dataset )
   = button_get 'Inferências', reasoner_path( @dataset, name: 'self' )
   = button_get 'OntoGraf',ontograf_path( @dataset )
-  /= button_get 'Estatísticas', statistics_path( @dataset )
 
 %hr
 
@@ -57,13 +56,13 @@
         %tr
           %td= feeder.name
           %td
-            = feeder.summation :demand
+            = feeder.summation :positive_demand
             VA
           %td= button_get 'Detalhes', show_feeder_path( @dataset, feeder.name )
     %tr
       %td( colspan = 3 )
         Demanda Total:
-        = feeders.map { |i| i.summation :demand }.inject(:+)
+        = feeders.map { |i| i.summation :positive_demand }.inject(:+)
         VA
     %tr
       %td( colspan = 3 )
@@ -92,7 +91,7 @@
           %tr
             %td= building_system.name
             %td
-              = building_system.summation :demand rescue 0
+              = building_system.summation :positive_demand
               VA
             %td= button_get 'Detalhes', show_building_system_path( @dataset, building_system.name )
       %tr

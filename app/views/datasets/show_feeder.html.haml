@@ -31,7 +31,7 @@
         %br/
         Demanda:
         %strong
-          = @individual.summation :demand
+          = @individual.summation :positive_demand
           VA
         %br/
         RDP:
@@ -40,6 +40,8 @@
           VA
       %td
         = button_get 'Inferências', reasoner_path( @dataset, @individual.name )
+        = button_get 'Estatísticas', statistics_path( @dataset, @individual.name )
+        = button_get 'Curvas de Carga',charts_path( @dataset, @individual.name )
         = button_get 'Editar', edit_feeder_path( @dataset, @individual.name )
         = button_delete 'Excluir', destroy_feeder_path( @dataset, @individual.name )
 
@@ -73,7 +75,7 @@
       %th
         Demanda Total
     %tbody
-      - if @individual.has_children?
+      - unless @individual.has_children?
         %tr
           %td( colspan = 2 )
             Não há sistemas prediais interligados a este alimentador!
@@ -82,5 +84,5 @@
           %tr
             %td= individual.name
             %td
-              = individual.summation :demand
+              = individual.summation :positive_demand
               VA
