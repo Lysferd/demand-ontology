@@ -305,6 +305,10 @@ class Dataset < ActiveRecord::Base
   def create_individual args
     datawrite do
 
+      fail if args[:name].empty? or args[:class].empty?
+      fail if ontology_class args[:name]
+      fail if individual args[:name]
+
       # -=-=-=-=-
       ont_class = ontology_class args[:class]
 
@@ -352,8 +356,7 @@ class Dataset < ActiveRecord::Base
     end
 
   rescue
-    tdb.abort
-    raise
+    return false
   end
 
   #-------------------------------------------------------------------------
@@ -362,9 +365,14 @@ class Dataset < ActiveRecord::Base
   #-------------------------------------------------------------------------
   def update_individual args
     datawrite do
+
+      fail if args[:name].empty? or args[:class].empty?
+
       individual = model.get_individual irify args[:original_name]
 
       unless args[:original_name] == args[:name]
+        fail if individual args[:name]
+        fail if ontology_class args[:name]
         Util::ResourceUtils::rename_resource individual, irify(args[:name])
         individual = model.get_individual irify args[:name]
       end
@@ -406,7 +414,7 @@ class Dataset < ActiveRecord::Base
       return true
     end
   rescue
-    raise
+    return false
   end
 
   #-------------------------------------------------------------------------

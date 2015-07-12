@@ -176,7 +176,7 @@ class DatasetsController < ApplicationController
       redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_A'] ),
                   notice: 'Recurso criado com sucesso.'
     else
-      redirect_to new_building_system_path,
+      redirect_to new_resource_path( dataset ),
                   alert: 'Não foi possível criar recurso.'
     end
   end
@@ -187,7 +187,7 @@ class DatasetsController < ApplicationController
       redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_A'] ),
                   notice: 'Recurso modificado com sucesso.'
     else
-      redirect_to edit_building_system_path,
+      redirect_to edit_resource_path( dataset, params[:individual][:original_name] ),
                   alert: 'Não foi possível modificar recurso.'
     end
   end

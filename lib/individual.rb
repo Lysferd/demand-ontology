@@ -158,7 +158,7 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def start_time
-    return '00:00' unless has_property? 'Início_de_Atividade'
+    return '00:00' if not has_property? 'Início_de_Atividade' or value('Início_de_Atividade').empty?
     return value 'Início_de_Atividade'
   end
 
@@ -170,7 +170,7 @@ class AbstractIndividual < Dataset
 
   #-------------------------------------------------------------------------
   def duration_time
-    return '23:59' unless has_property? 'Duração_de_Atividade'
+    return '23:59' if not has_property? 'Duração_de_Atividade' or value('Duração_de_Atividade').empty?
     return value 'Duração_de_Atividade'
   end
 

@@ -22,7 +22,7 @@
         %tr
           %td= label_tag 'individual[property][resource:Pertence_A]', 'Pertence_A:'
           %td= select_tag 'individual[property][resource:Pertence_A]',
-            select_helper( individuals ), { prompt: 'Selecione um indivíduo' }
+            select_helper( individuals, selected: params[:parent] ), disabled: true
 
       %tr
         %td= select_tag 'property',

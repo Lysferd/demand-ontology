@@ -34,8 +34,8 @@ Rails.application.routes.draw do
     delete 'destroy_building_system/:id/:name' => :destroy_building_system, as: :destroy_building_system
 
     # -=-=-=-=-
-    # Define routes for Resources (AJAX)
-    get 'new_resource/:id'              => :new_resource, as: :new_resource
+    # Define routes for Resources:
+    get 'new_resource/:id/:parent'      => :new_resource, as: :new_resource
     get 'edit_resource/:id/:name'       => :edit_resource, as: :edit_resource
     post 'create_resource'              => :create_resource
     post 'update_resource'              => :update_resource
