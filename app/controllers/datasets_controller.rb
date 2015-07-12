@@ -230,9 +230,8 @@ class DatasetsController < ApplicationController
 
   #============================================================================
   def query
-    @dataset = Dataset::find_by_id( params[:id] )
-
-    @back = dataset_path( params[:id] )
+    @dataset = Dataset::find_by_id params[:id]
+    @back = dataset_path params[:id]
   end
 
   #============================================================================
@@ -248,11 +247,17 @@ class DatasetsController < ApplicationController
   end
 
   #============================================================================
+  def charts
+    dataset = Dataset::find_by_id params[:id]
+    @individual = dataset.individual params[:name]
+  end
+
+  #============================================================================
   # AJAX GET /send_rdf_source
   # * Sends the RDF/OWL source file to download.
   #============================================================================
   def send_rdf_source
-    dataset = Dataset::find_by_id( params[:id] )
+    dataset = Dataset::find_by_id params[:id]
     path = "datasets/#{dataset.name}/#{dataset.rdf_source}"
     send_file( path, type: 'application/owl+xml', x_sendfile: true )
   end
@@ -266,24 +271,6 @@ class DatasetsController < ApplicationController
     if @type == 'resource'
       @individuals = Dataset::find_by_id(params[:dataset_id]).individuals
     end
-  end
-
-  def ontograf
-    dataset = Dataset::find_by_id( params[:id] )
-
-    @ontclasses = [ ]
-    dataset.model.list_hierarchy_root_classes.each do |c|
-      @ontclasses << test(@ontclasses, c)
-    end
-  end
-
-  def test(arr, c)
-    arr << c.local_name
-    c.list_sub_classes.each do |sub|
-      #arr << sub.local_name
-      test(arr, sub)
-    end
-    nil
   end
 
   # GET /datasets

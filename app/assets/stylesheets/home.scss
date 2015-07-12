@@ -3,15 +3,24 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 #head {
-	position: absolute;
+  position: absolute;
   left: 0;
   top: 0;
-	width: 100%;
-	height: 10%;
-	background-color: #9991FF;
-	font-family: Verdana, Geneva, sans-serif;
-	font-variant: small-caps;
-	color: #FFF;
+  width: 100%;
+  height: 10%;
+  background-color: #9991FF;
+  font-family: Book Antiqua, Palatino, Palatino Linotype, Palatino LT STD, Georgia, serif;
+  //font-variant: small-caps;
+  color: #FFFFFF;
+
+  text-shadow: 0 1px 0 #ccc,
+               0 6px 1px rgba(0,0,0,.1),
+               0 0 5px rgba(0,0,0,.1),
+               0 1px 3px rgba(0,0,0,.3),
+               0 3px 5px rgba(0,0,0,.2),
+               0 5px 10px rgba(0,0,0,.25),
+               0 10px 10px rgba(0,0,0,.2),
+               0 20px 20px rgba(0,0,0,.15);
   
   #logo {
     float: right;
@@ -24,12 +33,18 @@
   }
   
   #title {
-	  float: left;
-  	padding-top: 10px;
-	  padding-left: 12px;
-  	margin-right: 18px;
-	  width: auto;
-  	font-size: 36px;
+    float: left;
+    padding-left: 6px;
+    width: auto;
+    font-size: 32px;
+
+    sub {
+      font-variant: none;
+      position: fixed;
+      left: 20px;
+      padding-top: 40px;
+      font-size: 18px;
+    }
   }
 }
 

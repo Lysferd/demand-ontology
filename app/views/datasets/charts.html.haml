@@ -1,0 +1,10 @@
+= content_for( :subtitle ) do
+  = "Curvas de Carga de #{@individual.name}"
+
+%h3
+  Demanda:
+= area_chart @individual.timeline :demand
+%hr/
+%h3
+  RDP:
+= area_chart @individual.timeline :rdp

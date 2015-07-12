@@ -1,6 +1,4 @@
-= content_for( :subtitle ) do
-  Editando Usuário
+- content_for( :subtitle ) do
+  = "Editando #{@user.name}"
 
 = render 'form'
-= button_get 'Show', @user
-= button_get 'Back', users_path

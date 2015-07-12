@@ -1,5 +1,5 @@
-= content_for( :subtitle ) do
-  = "detalhes de #{@dataset.name}"
+- content_for( :subtitle ) do
+  = "Detalhes de #{@dataset.name}"
 
 %table
   %caption
@@ -32,7 +32,7 @@
   = button_get 'Query', query_path( @dataset )
   = button_get 'Inferências', reasoner_path( @dataset, name: 'self' )
   = button_get 'OntoGraf',ontograf_path( @dataset )
-  = button_get 'Estatísticas', statistics_path( @dataset )
+  /= button_get 'Estatísticas', statistics_path( @dataset )
 
 %hr
 

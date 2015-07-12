@@ -40,6 +40,7 @@
           VA
       %td
         = button_get 'Inferências', reasoner_path( @dataset, @individual.name )
+        = button_get 'Curvas de Carga',charts_path( @dataset, @individual.name )
         = button_get 'Editar', edit_building_system_path( @dataset, @individual.name )
         = button_delete 'Excluir', destroy_building_system_path( @dataset, @individual.name )
 
@@ -105,14 +106,20 @@
             %strong
               = resource.rdp
               VA
+            %br/
+            Tempo de Atividade:
+            %strong
+              = resource.activity_period
           %td
             - for property in resource.properties do
               = property.predicate.local_name + ':'
               = property.object.resource ? property.resource.local_name : property.string
               %br/
           %td
+            = button_get 'Curvas de Carga',charts_path( @dataset, resource.name )
             = button_get 'Editar', edit_resource_path( @dataset, resource.name )
             = button_delete 'Excluir', destroy_resource_path( @dataset, resource.name )
+
     %tr
       %td( colspan = 4 )
         = button_get 'Adicionar Recurso', new_resource_path( @dataset )

@@ -4,7 +4,7 @@
 
 $ ->
   $( 'td.template' ).click ->
-    $( 'textarea #query' ).val( $(@).text() )
+    $( 'textarea#query' ).val( $(@).text() )
 
   $( 'select#property' ).change ->
     values = $('select#property :selected').val().split ':'

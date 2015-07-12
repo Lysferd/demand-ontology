@@ -13,14 +13,13 @@
     #head
       #title
         Ontologias de Demanda
-        - if content_for?( :subtitle )
-          \:
-          = yield( :subtitle )
-      #logo= image_tag( 'logo.png' )
+        %sub= yield :subtitle if content_for? :subtitle
+
+      #logo= image_tag 'logo.png'
 
     #spinner( hidden = true )
       %p
-        = image_tag( 'spinner.gif' )
+        = image_tag 'spinner.gif'
         %br/
         Carregando...
 
@@ -39,11 +38,9 @@
       #copyright
         Sistema de Ontologias de Demanda
         %sub
-          v1.9
+          v2.0
       #back-button
-        = button_get 'Voltar', (@back ? @back : :back)
+        = button_get 'Voltar', ( @back ? @back : :back )
       #links
         %span( title = 'E-mail de Contato' )
           = link_to image_tag('iconeemail.png'), 'mailto:carlosbarbosa1964@hotmail.com'
-        %span( title = 'Código-Fonte no Github' )
-          = link_to image_tag('GitHub-Mark-Light-32px.png'), 'https://github.com/CarlosBarbosa1964/demand-ontology'

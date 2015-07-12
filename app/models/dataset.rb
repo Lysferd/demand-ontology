@@ -300,43 +300,48 @@ class Dataset < ActiveRecord::Base
   public
   #-------------------------------------------------------------------------
   # * Dataset Individual Creation
+  # fixme: move this to abstract individual
   #-------------------------------------------------------------------------
   def create_individual args
     datawrite do
 
       # -=-=-=-=-
-      ont_class_iri = irify args[:class]
-      ont_class = model.get_ont_class( ont_class_iri )
+      ont_class = ontology_class args[:class]
 
-      unless ont_class
-        fail ArgumentError, 'Given ontology class does not exist.'
-        tdb.abort
-      end
+      fail ArgumentError, 'Given ontology class does not exist.' unless ont_class
 
       # -=-=-=-=-
-      individual_iri = irify args[:name]
-      individual = model.create_individual( individual_iri, ont_class )
+      # Check parent classes.
+      #parents = [ '' ]
+      #if args[:property] and args[:property]['resource:Pertence_A']
+      #  i = individual args[:property]['resource:Pertence_A']
+      #  parents.unshift i.name
+      #  while i.has_parent?
+      #    i = i.parent
+      #    parents.unshift i.name
+      #  end
+      #end
+
+      # -=-=-=-=-
+      individual_iri = irify( args[:name] ) #.insert( 0, parents.join( '+' ) ) )
+      individual = model.create_individual individual_iri, ont_class
 
       # -=-=-=-=-
       # Manually include individual in owl:NamedIndividual type.
-      named_individual = model.create_class( owl_prefix + 'NamedIndividual' )
-      model.create_individual( individual_iri, named_individual )
+      named_individual = model.create_class owl_prefix + 'NamedIndividual'
+      model.create_individual individual_iri, named_individual
 
       for key, value in args[:property] do
         property_iri = irify( key.split( ?: )[1] )
-        property = model.get_property( property_iri )
+        property = model.get_property property_iri
 
-        if key =~ /resource/
-          resource_iri = irify( value )
-          resource = model.get_individual( resource_iri )
-        else
-          resource = case key
-                       when /int/     then model.create_typed_literal( value.to_i )
-                       when /double/  then model.create_typed_literal( value.to_f )
-                       when /literal/ then model.create_typed_literal( value.to_s )
-                       else model.create_literal( value )
-                     end
-        end
+        resource = case key
+                   when /int/      then model.create_typed_literal( value.to_i )
+                   when /double/   then model.create_typed_literal( value.to_f )
+                   when /string/   then model.create_typed_literal( value.to_s )
+                   when /resource/ then model.get_individual irify value
+                   else fail ArgumentError, 'Unknown type of property.'
+                   end
 
         individual.add_property( property, resource )
       end if args[:property]
@@ -345,19 +350,30 @@ class Dataset < ActiveRecord::Base
 
       return individual
     end
+
+  rescue
+    tdb.abort
+    raise
   end
 
   #-------------------------------------------------------------------------
+  # * Dataset Individual Update
+  # fixme: move this to abstract individual
+  #-------------------------------------------------------------------------
   def update_individual args
     datawrite do
-      individual = model.get_individual( irify( args[:original_name] ) )
+      individual = model.get_individual irify args[:original_name]
 
       unless args[:original_name] == args[:name]
-        Util::ResourceUtils::rename_resource( individual, irify( args[:name] ) )
-        individual = model.get_individual( irify( args[:name] ) )
+        Util::ResourceUtils::rename_resource individual, irify(args[:name])
+        individual = model.get_individual irify args[:name]
       end
 
-      # FIXME: sometimes the owl:NamedIndividual class gets in the way.
+      if args[:property] and args['resource:Pertence_A']
+        # fixme: rename individual appropriately.
+        # fixme: rename all children as well.
+      end
+
       ont_class = model.get_ont_class( namespace + args[:class] )
       individual.ont_class = ont_class unless individual.get_ont_class == ont_class
 
@@ -370,16 +386,17 @@ class Dataset < ActiveRecord::Base
 
         else
           resource = case key
-                     when /int/     then ResourceFactory::create_typed_literal( value.to_i )
-                     when /double/  then ResourceFactory::create_typed_literal( value.to_f )
-                     when /literal/ then ResourceFactory::create_typed_literal( value.to_s )
-                     else model.get_individual( irify( value ) )
+                     when /int/      then ResourceFactory::create_typed_literal( value.to_i )
+                     when /double/   then ResourceFactory::create_typed_literal( value.to_f )
+                     when /string/   then ResourceFactory::create_typed_literal( value.to_s )
+                     when /resource/ then model.get_individual( irify( value ) )
+                     else fail ArgumentError, 'Unknown type of property.'
                      end
 
-          if individual.has_property?(property) and not individual.get_property_value( property ) == resource
-            individual.set_property_value(property, resource)
+          if individual.has_property? property and individual.get_property_value(property) != resource
+            individual.set_property_value property, resource
           else
-            individual.add_property(property, resource)
+            individual.add_property property, resource
           end
         end
       end if args[:property]
@@ -388,8 +405,13 @@ class Dataset < ActiveRecord::Base
 
       return true
     end
+  rescue
+    raise
   end
 
+  #-------------------------------------------------------------------------
+  # * Dataset Individual Dispose
+  # fixme: move this to abstract individual.
   #-------------------------------------------------------------------------
   def destroy_individual name
     datawrite do
@@ -412,12 +434,22 @@ class Dataset < ActiveRecord::Base
   # @param [String] object
   #-------------------------------------------------------------------------
   def individual object
-    return AbstractIndividual::new object.kind_of?(Individual) ? object : model.get_individual(irify(object))
+    if object.kind_of? String
+      reference = model.get_individual irify object
+    else
+      reference = object
+    end
+
+    return AbstractIndividual::new reference
   end
 
   #-------------------------------------------------------------------------
   def ontology_class name
     return model.get_ont_class irify name
+  end
+
+  def list_hierarchy_root_classes
+    return model.list_hierarchy_root_classes
   end
 
   #-------------------------------------------------------------------------

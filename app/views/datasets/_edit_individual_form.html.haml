@@ -31,21 +31,10 @@
                 = select_tag "individual[property][resource:#{name}]", options, id: "input_#{name}"
 
               - else
-                - if property.object.to_s =~ /int/i
-                  - type = 'int'
-                  - value = property.int
-                - elsif property.object.to_s =~ /double/i
-                  - type = 'double'
-                  - value = property.double
-                - elsif property.object.to_s =~ /literal/i
-                  - type = 'str'
-                  - value = property.string
-                - else
-                  - type = nil
-                  - value = property.object
+                - value, type = *property.literal.to_s.match( /(.+)\^\^.+#(\w+)/ ).captures
                 = text_field_tag "individual[property][#{type}:#{name}]", value, id: "input_#{name}"
-              = link_to image_tag('destroy.svg'), '#',
-                id: "destroy_#{name}",
+
+              = link_to image_tag('destroy.svg'), '#', id: "destroy_#{name}",
                 title: 'Remover propriedade.',
                 data: { property: "destroy:#{name}", original_property: "#{type}:#{name}", mode: false }
 
@@ -55,5 +44,5 @@
           = select_tag 'property', options, { prompt: 'Selecione uma propriedade' }
         %td= link_to 'Adicionar Propriedade', '#', id: 'add_property',
           data: { dataset_id: params[:id], type: nil, property: nil }
-  %p
-    = submit_tag 'Aplicar'
+
+  %p= submit_tag 'Aplicar'
