@@ -305,14 +305,12 @@ class Dataset < ActiveRecord::Base
   def create_individual args
     datawrite do
 
-      fail if args[:name].empty? or args[:class].empty?
-      fail if ontology_class args[:name]
-      fail if individual args[:name]
+      fail 'nem o nome e nem a classe do indivíduo podem ser nulos.' if args[:name].empty? or args[:class].empty?
+      fail 'o nome do indivíduo não pode ser o mesmo de uma classe.' if ontology_class args[:name]
 
       # -=-=-=-=-
       ont_class = ontology_class args[:class]
-
-      fail ArgumentError, 'Given ontology class does not exist.' unless ont_class
+      fail 'não existe classe com esse nome.' unless ont_class
 
       # -=-=-=-=-
       # Check parent classes.
@@ -327,7 +325,8 @@ class Dataset < ActiveRecord::Base
       #end
 
       # -=-=-=-=-
-      individual_iri = irify( args[:name] ) #.insert( 0, parents.join( '+' ) ) )
+      individual_iri = irify args[:name]
+      fail 'já existe um indivíduo com este nome.' if model.get_individual individual_iri
       individual = model.create_individual individual_iri, ont_class
 
       # -=-=-=-=-
@@ -344,19 +343,16 @@ class Dataset < ActiveRecord::Base
                    when /double/   then model.create_typed_literal( value.to_f )
                    when /string/   then model.create_typed_literal( value.to_s )
                    when /resource/ then model.get_individual irify value
-                   else fail ArgumentError, 'Unknown type of property.'
+                   else fail "#{key} é um tipo desconhecido de propriedade informada."
                    end
 
-        individual.add_property( property, resource )
+        individual.add_property property, resource
       end if args[:property]
 
       tdb.commit
 
       return individual
     end
-
-  rescue
-    return false
   end
 
   #-------------------------------------------------------------------------
@@ -366,13 +362,15 @@ class Dataset < ActiveRecord::Base
   def update_individual args
     datawrite do
 
-      fail if args[:name].empty? or args[:class].empty?
+      fail 'nem o nome e nem a classe do indivíduo podem ser nulos.' if args[:name].empty? or args[:class].empty?
 
       individual = model.get_individual irify args[:original_name]
 
       unless args[:original_name] == args[:name]
-        fail if individual args[:name]
-        fail if ontology_class args[:name]
+        fail 'já existe um indivíduo com este nome.' if model.get_individual irify args[:name]
+        fail 'o nome do indivíduo não pode ser o mesmo de uma classe.' if ontology_class args[:name]
+
+        individual = model.get_individual irify args[:original_name]
         Util::ResourceUtils::rename_resource individual, irify(args[:name])
         individual = model.get_individual irify args[:name]
       end
@@ -398,7 +396,7 @@ class Dataset < ActiveRecord::Base
                      when /double/   then ResourceFactory::create_typed_literal( value.to_f )
                      when /string/   then ResourceFactory::create_typed_literal( value.to_s )
                      when /resource/ then model.get_individual( irify( value ) )
-                     else fail ArgumentError, 'Unknown type of property.'
+                     else fail "#{key} é um tipo desconhecido de propriedade informada."
                      end
 
           if individual.has_property? property and individual.get_property_value(property) != resource
@@ -413,8 +411,6 @@ class Dataset < ActiveRecord::Base
 
       return true
     end
-  rescue
-    return false
   end
 
   #-------------------------------------------------------------------------

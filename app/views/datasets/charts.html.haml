@@ -2,9 +2,17 @@
   = "Curvas de Carga de #{@individual.name}"
 
 %h3
-  Demanda:
+  Demanda Total:
 = area_chart @individual.timeline(:demand, @individual.kind_of?('Alimentador') )
 %hr/
 %h3
   Resposta à Demanda Provável (RDP):
 = area_chart @individual.timeline( :rdp, @individual.kind_of?('Alimentador') )
+%hr/
+%h3
+  Potências Ativas:
+= area_chart @individual.timeline( :active_power, @individual.kind_of?('Alimentador') )
+%hr/
+%h3
+  Potências Reativas:
+= area_chart @individual.timeline( :reactive_power, @individual.kind_of?('Alimentador') )

@@ -5,7 +5,7 @@
 delay = (ms, func) -> setTimeout func, ms
 
 $ ->
-  delay 2500, -> $( 'div#notice, div#alert' ).fadeOut 'slow'
+  delay 10000, -> $( 'div#notice, div#alert' ).fadeOut 'slow'
 
   # AJAX Callbacks.
   $( document ).on 'ajax:before ajaxStart page:fetch', ->

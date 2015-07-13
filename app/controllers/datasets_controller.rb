@@ -3,15 +3,39 @@
 class DatasetsController < ApplicationController
   before_action :set_dataset, only: [:show, :edit, :update, :destroy]
 
+  def new_individual ontological_class = nil, parent_class = nil, parent_individual = nil
+    dataset = Dataset::find_by_id params[:id]
+
+    if ontological_class.nil?
+      @ontological_class = dataset.classes
+    else
+      @ontological_class = dataset.ontology_class ontological_class
+    end
+
+    @property_list     = dataset.properties
+
+    if parent_class.nil?
+      @individual_list = dataset.individuals
+    else
+      @individual_list = dataset.individuals class: parent_class
+    end
+
+    unless parent_individual.nil?
+      @parent_individual = dataset.individual params[:parent]
+    end
+  end
+
+  def create_individual
+    dataset = Dataset::find_by_id params[:individual][:dataset_id]
+    return dataset.create_individual params[:individual]
+  end
+
   #============================================================================
   # GET /new_feeder
   # * Creates a form page for the creation of Feeders.
   #============================================================================
   def new_feeder
-    dataset = Dataset::find_by_id params[:id]
-    @ont_class = dataset.ontology_class 'Alimentador'
-    @properties = dataset.properties
-    @individuals = dataset.individuals
+    new_individual 'Alimentador'
   end
 
   #============================================================================
@@ -19,13 +43,16 @@ class DatasetsController < ApplicationController
   # * Creates a new individual based on the parameters given.
   #============================================================================
   def create_feeder
-    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    feeder = dataset.create_individual( params[:individual] )
-    if feeder
-      redirect_to show_feeder_path( dataset, feeder.local_name ), notice: 'Alimentador criado com sucesso.'
+    if create_individual
+      redirect_to show_feeder_path( params[:individual][:dataset_id], params[:individual][:name] ),
+                  notice: 'Alimentador criado com sucesso.'
     else
-      redirect_to new_feeder_path, alert: 'Não foi possível criar alimentador.'
+      redirect_to new_feeder_path( params[:individual][:dataset_id] ),
+                  alert: 'Não foi possível criar alimentador.'
     end
+  rescue Exception
+    redirect_to new_feeder_path( params[:individual][:dataset_id] ),
+                alert: "Não foi possível criar alimentador: #{$!.message}"
   end
 
   #============================================================================
@@ -47,7 +74,7 @@ class DatasetsController < ApplicationController
       redirect_to show_feeder_path( dataset, params[:individual][:name] ),
                   notice: 'Alimentador modificado com sucesso.'
     else
-      redirect_to edit_feeder_path, alert: 'Não foi possível modificar alimentador.'
+      redirect_to edit_feeder_path, alert: "Não foi possível modificar alimentador: #{$!.message}"
     end
   end
 
@@ -81,10 +108,7 @@ class DatasetsController < ApplicationController
   # * Creates a form page for the creation of Feeders.
   #============================================================================
   def new_building_system
-    dataset = Dataset::find_by_id params[:id]
-    @ontclass = dataset.ontology_class 'Sistema_Predial'
-    @properties = dataset.properties
-    @individuals = dataset.feeders
+    new_individual 'Sistema_Predial', 'Alimentador'
   end
 
   #============================================================================
@@ -92,14 +116,12 @@ class DatasetsController < ApplicationController
   # * Creates a new individual based on the parameters given.
   #============================================================================
   def create_building_system
-    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    building_system = dataset.create_individual( params[:individual] )
-    if building_system
-      redirect_to show_building_system_path( dataset, building_system.local_name ),
+    if create_individual
+      redirect_to show_building_system_path( params[:individual][:dataset_id], params[:individual][:name] ),
                   notice: 'Sistema predial criado com sucesso.'
     else
-      redirect_to new_building_system_path,
-                  alert: 'Não foi possível criar sistema predial.'
+      redirect_to new_building_system_path( params[:individual][:dataset_id] ),
+                  alert: "Não foi possível criar sistema predial: #{$!.message}"
     end
   end
 
@@ -123,7 +145,7 @@ class DatasetsController < ApplicationController
                   notice: 'Sistema predial modificado com sucesso.'
     else
       redirect_to edit_building_system_path,
-                  alert: 'Não foi possível modificar sistema predial.'
+                  alert: "Não foi possível modificar sistema predial: #{$!.message}"
     end
   end
 
@@ -158,10 +180,7 @@ class DatasetsController < ApplicationController
   # * Form for resource creation.
   #============================================================================
   def new_resource
-    dataset = Dataset::find_by_id( params[:id] )
-    @ont_classes = dataset.classes
-    @properties = dataset.properties
-    @individuals = dataset.building_systems
+    new_individual nil, nil, true
   end
 
   def edit_resource
@@ -170,14 +189,12 @@ class DatasetsController < ApplicationController
   end
 
   def create_resource
-    dataset = Dataset::find_by_id( params[:individual][:dataset_id] )
-    resource = dataset.create_individual( params[:individual] )
-    if resource
-      redirect_to show_building_system_path( dataset, params[:individual][:property]['resource:Pertence_A'] ),
+    if create_individual
+      redirect_to show_building_system_path( params[:individual][:dataset_id], params[:individual][:property]['resource:Pertence_A'] ),
                   notice: 'Recurso criado com sucesso.'
     else
-      redirect_to new_resource_path( dataset ),
-                  alert: 'Não foi possível criar recurso.'
+      redirect_to new_resource_path( params[:individual][:dataset_id] ),
+                  alert: "Não foi possível criar recurso: #{$!.message}"
     end
   end
 
@@ -188,7 +205,7 @@ class DatasetsController < ApplicationController
                   notice: 'Recurso modificado com sucesso.'
     else
       redirect_to edit_resource_path( dataset, params[:individual][:original_name] ),
-                  alert: 'Não foi possível modificar recurso.'
+                  alert: "Não foi possível modificar recurso: #{$!.message}"
     end
   end
 

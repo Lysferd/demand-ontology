@@ -1,5 +1,5 @@
 - content_for( :subtitle ) do
-  Estatísticas
+  = "Estatísticas do #{@individual.name}"
 
 %h3
   Resposta à Demanda Provável (RDP):
@@ -9,4 +9,13 @@
 %h3
   Recursos Energéticos Distribuídos (DER):
 - data = { 'Demanda Total' => @individual.summation(:positive_demand), 'DER Total' => @individual.summation(:der) }
+= pie_chart data
+%hr/
+%h3
+  Participação dos Recursos na Demanda Total
+- data = { }
+- if @individual.kind_of? 'Alimentador'
+  - @individual.children.each { |o| data[o.name] = o.summation :positive_demand }
+- else
+  - @individual.children.each { |o| data[o.name] = o.positive_demand }
 = pie_chart data

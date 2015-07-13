@@ -13,20 +13,19 @@
       %tr
         %td= label_tag 'individual[class]', 'Classe:'
         - if not route =~ /resource/
-          %td= text_field_tag 'individual[class]', ont_class, readonly: true
-
+          %td= text_field_tag 'individual[class]', ontological_class, readonly: true
         - else
-          %td= select_tag 'individual[class]', select_helper( ont_classes, { prompt: 'Selecione uma classe' } )
+          %td= select_tag 'individual[class]', select_helper( ontological_class, { prompt: 'Selecione uma classe' } )
 
       - if route =~ /resource|building_system/
         %tr
           %td= label_tag 'individual[property][resource:Pertence_A]', 'Pertence_A:'
           %td= select_tag 'individual[property][resource:Pertence_A]',
-            select_helper( individuals, selected: params[:parent] ), disabled: true
+            select_helper( individual_list, selected: params[:parent] )
 
       %tr
         %td= select_tag 'property',
-          select_properties( properties ), { prompt: 'Selecione uma propriedade' }
+          select_properties( property_list ), { prompt: 'Selecione uma propriedade' }
         %td= link_to 'Adicionar Propriedade', '#', id: 'add_property',
           data: { dataset_id: id, type: nil, property: nil }
 
