@@ -3,16 +3,28 @@
 
 %h3
   Demanda Total:
-= area_chart @individual.timeline(:demand, @individual.kind_of?('Alimentador') )
+= area_chart @individual.timeline(:demand, true ), { height: '100%' }
 %hr/
+- if @individual.kind_of? 'Sistema_Predial'
+  %h3
+    Demanda Individual dos Recursos:
+  = area_chart @individual.timeline(:demand), { height: '100%' }
+  %hr/
+
+- if @individual.kind_of? 'Alimentador'
+  %h3
+    Demanda Individual dos Prédios:
+  = area_chart(@individual.children.flat_map { |c| c.timeline(:demand, true) })
+  %hr/
+
 %h3
   Resposta à Demanda Provável (RDP):
-= area_chart @individual.timeline( :rdp, @individual.kind_of?('Alimentador') )
+= area_chart @individual.timeline( :rdp, @individual.kind_of?('Alimentador') ), { height: '100%' }
 %hr/
 %h3
   Potências Ativas:
-= area_chart @individual.timeline( :active_power, @individual.kind_of?('Alimentador') )
+= area_chart @individual.timeline( :active_power, @individual.kind_of?('Alimentador') ), { height: '100%' }
 %hr/
 %h3
   Potências Reativas:
-= area_chart @individual.timeline( :reactive_power, @individual.kind_of?('Alimentador') )
+= area_chart @individual.timeline( :reactive_power, @individual.kind_of?('Alimentador') ), { height: '100%' }

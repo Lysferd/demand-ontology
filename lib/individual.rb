@@ -205,7 +205,7 @@ class AbstractIndividual < Dataset
       end
 
       return timelines unless merge
-      return [ name: @name, data: timelines.inject { |m, o| m.merge(o[:data]) { |_, old, new| old + new } } ]
+      return [ name: @name, data: timelines.inject({}) { |m, o| m.merge(o[:data]) { |_, old, new| old + new } } ]
 
     else
       data = { }
